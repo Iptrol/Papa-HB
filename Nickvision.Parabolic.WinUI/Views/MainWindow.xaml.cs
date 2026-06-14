@@ -77,52 +77,50 @@ public sealed partial class MainWindow : Window
         eventsService.DownloadRetired += (sender, e) => DispatcherQueue.TryEnqueue(() => Controller_DownloadRetired(sender, e));
         eventsService.DownloadRequested += async (s, args) => await AddDownloadAsync(args.Url);
         // Translations
-        AppWindow.Title = _appInfo.ShortName;
-        LblTitle.Text = _appInfo.ShortName;
-        MenuFile.Title = _translationService._("File");
-        MenuAddDownload.Text = _translationService._("Add Download");
-        MenuExit.Text = _translationService._("Exit");
-        MenuEdit.Title = _translationService._("Edit");
-        MenuKeyring.Text = _translationService._("Keyring");
-        MenuSettings.Text = _translationService._("Settings");
-        MenuView.Title = _translationService._("View");
-        MenuHistory.Text = _translationService._("History");
-        MenuDownloads.Title = _translationService._("Downloads");
-        MenuStopAllRemaining.Text = _translationService._("Stop All Remaining");
-        MenuRetryAllFailed.Text = _translationService._("Retry All Failed");
-        MenuClearAllQueued.Text = _translationService._("Clear All Queued");
-        MenuClearAllCompleted.Text = _translationService._("Clear All Completed");
-        MenuHelp.Title = _translationService._("Help");
-        MenuCheckForUpdates.Text = _translationService._("Check for Updates");
-        MenuGitHubRepo.Text = _translationService._("GitHub Repo");
-        MenuReportABug.Text = _translationService._("Report a Bug");
-        MenuDiscussions.Text = _translationService._("Discussions");
-        MenuAbout.Text = _translationService._("About {0}", _appInfo.ShortName!);
-        ToolTipService.SetToolTip(BtnPreview, _translationService._("You are running a preview version of {0}", _appInfo.ShortName!));
-        LblPreview.Text = _translationService._("Thank you for testing the upcoming features and changes! ❤️");
-        LblHomeTitle.Text = _translationService._("Download Media");
-        LblHomeDescription.Text = _translationService._("Add a video, audio, or playlist URL to start downloading");
-        LblAddDownload.Text = _translationService._("Add Download");
-        LblKeyring.Text = _translationService._("Keyring");
-        LblSettings.Text = _translationService._("Settings");
-        BtnStopAllRemaining.Label = _translationService._("Stop All Remaining");
-        BtnRetryAllFailed.Label = _translationService._("Retry All Failed");
-        BtnClearAllQueued.Label = _translationService._("Clear All Queued");
-        BtnClearAllCompleted.Label = _translationService._("Clear All Completed");
-        LblDownloadsAddDownload.Text = _translationService._("Add");
-        NavDownloadsAll.Content = _translationService._("All");
-        NavDownloadsRunning.Content = _translationService._("Running");
-        NavDownloadsQueued.Content = _translationService._("Queued");
-        NavDownloadsCompleted.Content = _translationService._("Completed");
-        NavDownloadsFailed.Content = _translationService._("Failed");
-        StatusNoneDownloads.Title = _translationService._("No Downloads");
-        StatusNoneDownloads.Description = _translationService._("There are no downloads of this type");
-        LblNoneAddDownload.Text = _translationService._("Add Download");
-        DlgCredential.Title = _translationService._("Credential Required");
-        TxtCredentialUsername.PlaceholderText = _translationService._("Enter username here");
-        TxtCredentialPassword.PlaceholderText = _translationService._("Enter password here");
-        DlgCredential.PrimaryButtonText = _translationService._("Submit");
-        DlgCredential.CloseButtonText = _translationService._("Cancel");
+        AppWindow.Title = "Папа & Куницкие Кооперейшн 🌊";
+        LblTitle.Text = "Папа & Куницкие Кооперейшн 🌊";
+        MenuFile.Title = "Файл";
+        MenuAddDownload.Text = "Добавить загрузку";
+        MenuExit.Text = "Выход";
+        MenuEdit.Title = "Правка";
+        MenuKeyring.Text = "Связка ключей";
+        MenuSettings.Text = "Настройки";
+        MenuView.Title = "Вид";
+        MenuHistory.Text = "История";
+        MenuDownloads.Title = "Загрузки";
+        MenuStopAllRemaining.Text = "Остановить все";
+        MenuRetryAllFailed.Text = "Повторить неудачные";
+        MenuClearAllQueued.Text = "Очистить очередь";
+        MenuClearAllCompleted.Text = "Очистить завершённые";
+        MenuHelp.Title = "Помощь";
+        MenuCheckForUpdates.Text = "Проверить обновления";
+        MenuReportABug.Text = "Сообщить об ошибке";
+        MenuAbout.Text = "О программе";
+        ToolTipService.SetToolTip(BtnPreview, "Вы используете предварительную версию программы");
+        LblPreview.Text = "Спасибо за тестирование! ❤️";
+        LblHomeTitle.Text = "Привет, папа! 👋 Ну что, давай качать интересные видосы в дорогу? 🎬";
+        LblHomeDescription.Text = "Вставь ссылку на видео или музыку с YouTube — и скачивай!";
+        LblAddDownload.Text = "Добавить ссылку";
+        LblKeyring.Text = "Связка ключей";
+        LblSettings.Text = "Настройки";
+        BtnStopAllRemaining.Label = "Остановить все";
+        BtnRetryAllFailed.Label = "Повторить неудачные";
+        BtnClearAllQueued.Label = "Очистить очередь";
+        BtnClearAllCompleted.Label = "Очистить завершённые";
+        LblDownloadsAddDownload.Text = "Добавить";
+        NavDownloadsAll.Content = "Все";
+        NavDownloadsRunning.Content = "Идут";
+        NavDownloadsQueued.Content = "В очереди";
+        NavDownloadsCompleted.Content = "Завершённые";
+        NavDownloadsFailed.Content = "Ошибки";
+        StatusNoneDownloads.Title = "Нет загрузок";
+        StatusNoneDownloads.Description = "Загрузок этого типа пока нет";
+        LblNoneAddDownload.Text = "Добавить ссылку";
+        DlgCredential.Title = "Требуется авторизация";
+        TxtCredentialUsername.PlaceholderText = "Введите имя пользователя";
+        TxtCredentialPassword.PlaceholderText = "Введите пароль";
+        DlgCredential.PrimaryButtonText = "Войти";
+        DlgCredential.CloseButtonText = "Отмена";
     }
 
     private async void Window_Loaded(object? sender, RoutedEventArgs e)
@@ -135,11 +133,11 @@ public sealed partial class MainWindow : Window
         {
             var checkBox = new CheckBox()
             {
-                Content = _translationService._("Don't show this message again")
+                Content = "Больше не показывать"
             };
             var disclaimerDialog = new ContentDialog()
             {
-                Title = _translationService._("Legal Copyright Disclaimer"),
+                Title = "Важное замечание",
                 Content = new StackPanel()
                 {
                     Orientation = Orientation.Vertical,
@@ -148,13 +146,13 @@ public sealed partial class MainWindow : Window
                     {
                         new TextBlock()
                         {
-                            Text = _translationService._("Videos on YouTube and other sites may be subject to DMCA protection. The authors of Parabolic do not endorse, and are not responsible for, the use of this application in means that will violate these laws."),
+                            Text = "Видео на YouTube могут быть защищены авторским правом. Пожалуйста, скачивай только то, что разрешено.",
                             TextWrapping = TextWrapping.WrapWholeWords
                         },
                         checkBox
                     }
                 },
-                CloseButtonText = _translationService._("I understand"),
+                CloseButtonText = "Понятно",
                 DefaultButton = ContentDialogButton.Close,
                 RequestedTheme = MainGrid.ActualTheme,
                 XamlRoot = MainGrid.XamlRoot
@@ -169,10 +167,10 @@ public sealed partial class MainWindow : Window
         {
             var recoverDialog = new ContentDialog()
             {
-                Title = _translationService._("Recover Downloads?"),
-                Content = _translationService._("There are downloads available to recover from when Parabolic crashed. Would you like to download them again?"),
-                PrimaryButtonText = _translationService._("Yes"),
-                CloseButtonText = _translationService._("No"),
+                Title = "Восстановить загрузки?",
+                Content = "Есть незавершённые загрузки. Хочешь загрузить их снова?",
+                PrimaryButtonText = "Да",
+                CloseButtonText = "Нет",
                 DefaultButton = ContentDialogButton.Primary,
                 RequestedTheme = MainGrid.ActualTheme,
                 XamlRoot = MainGrid.XamlRoot
@@ -201,10 +199,10 @@ public sealed partial class MainWindow : Window
             e?.Cancel = true;
             var confirmDialog = new ContentDialog()
             {
-                Title = _appInfo.ShortName,
-                Content = _translationService._("There are downloads still in progress. Would you like to stop them and exit?"),
-                PrimaryButtonText = _translationService._("Yes"),
-                CloseButtonText = _translationService._("No"),
+                Title = "Папа & Куницкие Кооперейшн 🌊",
+                Content = "Есть незавершённые загрузки. Остановить их и выйти?",
+                PrimaryButtonText = "Да, выйти",
+                CloseButtonText = "Нет, подождать",
                 DefaultButton = ContentDialogButton.Close,
                 RequestedTheme = MainGrid.ActualTheme,
                 XamlRoot = MainGrid.XamlRoot
@@ -239,31 +237,31 @@ public sealed partial class MainWindow : Window
         };
         if (e.Notification.Action == "update")
         {
-            BtnInfoBar.Content = _translationService._("Update");
+            BtnInfoBar.Content = "Обновить";
             _notificationClickHandler = WindowsUpdate;
             BtnInfoBar.Click += _notificationClickHandler;
         }
         else if (e.Notification.Action == "update-ytdlp")
         {
-            BtnInfoBar.Content = _translationService._("Update");
+            BtnInfoBar.Content = "Обновить";
             _notificationClickHandler = YtdlpUpdate;
             BtnInfoBar.Click += _notificationClickHandler;
         }
         else if (e.Notification.Action == "update-deno")
         {
-            BtnInfoBar.Content = _translationService._("Update");
+            BtnInfoBar.Content = "Обновить";
             _notificationClickHandler = DenoUpdate;
             BtnInfoBar.Click += _notificationClickHandler;
         }
         else if (e.Notification.Action == "error" && !string.IsNullOrEmpty(e.Notification.ActionParam))
         {
-            BtnInfoBar.Content = _translationService._("Details");
+            BtnInfoBar.Content = "Подробнее";
             _notificationClickHandler = async (_, _) =>
             {
                 InfoBar.IsOpen = false;
                 var errorDialog = new ContentDialog()
                 {
-                    Title = _translationService._("Error"),
+                    Title = "Ошибка",
                     Content = new ScrollViewer()
                     {
                         HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
@@ -274,7 +272,7 @@ public sealed partial class MainWindow : Window
                             TextWrapping = TextWrapping.Wrap
                         }
                     },
-                    CloseButtonText = _translationService._("Close"),
+                    CloseButtonText = "Закрыть",
                     DefaultButton = ContentDialogButton.Close,
                     RequestedTheme = MainGrid.ActualTheme,
                     XamlRoot = MainGrid.XamlRoot
@@ -402,7 +400,7 @@ public sealed partial class MainWindow : Window
                 BtnUpdateProgress.Visibility = Visibility.Collapsed;
                 return;
             }
-            var message = _translationService._("Downloading update: {0}%", Math.Round(e.Percentage * 100));
+            var message = $"Скачиваем обновление: {Math.Round(e.Percentage * 100)}%";
             BtnUpdateProgress.Visibility = Visibility.Visible;
             ToolTipService.SetToolTip(BtnUpdateProgress, message);
             RingUpdateProcess.Value = e.Percentage * 100;
@@ -414,11 +412,8 @@ public sealed partial class MainWindow : Window
     {
         var progressDialog = new ContentDialog()
         {
-            Title = _translationService._("About {0}", _appInfo.ShortName!),
-            Content = new ProgressRing()
-            {
-                IsActive = true,
-            },
+            Title = "О программе",
+            Content = new ProgressRing() { IsActive = true },
             RequestedTheme = MainGrid.ActualTheme,
             XamlRoot = MainGrid.XamlRoot
         };
@@ -540,10 +535,7 @@ public sealed partial class MainWindow : Window
 
     private async Task LaunchUriAsync(Uri? uri)
     {
-        if (uri is null)
-        {
-            return;
-        }
+        if (uri is null) return;
         await Launcher.LaunchUriAsync(uri);
     }
 
