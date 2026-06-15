@@ -21,43 +21,10 @@
             <nickvision:ViewStack.Pages>
                 <StackPanel Orientation="Vertical" Spacing="12" MinWidth="400">
                     <TextBox x:Name="TxtUrl" TextChanged="TxtUrl_TextChanged"/>
-
-                    <Button x:Name="BtnSelectBatchFile" HorizontalAlignment="Stretch" Click="BtnSelectBatchFile_Click">
-                        <Button.Content>
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8A5;" FontSize="18"/>
-
-                                <TextBlock x:Name="LblSelectBatchFile"/>
-                            </StackPanel>
-                        </Button.Content>
-                    </Button>
-
-                    <ToggleSwitch x:Name="TglUseAuthentication"/>
-
-                    <StackPanel Orientation="Vertical" Spacing="6" Visibility="{x:Bind TglUseAuthentication.IsOn, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <ComboBox x:Name="CmbCredential" HorizontalAlignment="Stretch" SelectionChanged="CmbCredential_SelectionChanged">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate x:DataType="helpers:BindableSelectionItem">
-                                    <TextBlock Text="{x:Bind Label}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-
-                        <TextBox x:Name="TxtUsername" Visibility="Collapsed"/>
-
-                        <PasswordBox x:Name="TxtPassword" Visibility="Collapsed"/>
-                    </StackPanel>
-
-                    <ToggleSwitch x:Name="TglDownloadImmediatelyAsVideo" Toggled="TglDownloadImmediatelyAsVideo_Toggled"/>
-
-                    <ToggleSwitch x:Name="TglDownloadImmediatelyAsAudio" Toggled="TglDownloadImmediatelyAsAudio_Toggled"/>
-
-                    <TeachingTip x:Name="TeachDownloadImmediately" PreferredPlacement="Bottom"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" Spacing="24" Margin="0,24,0,0">
                     <ProgressRing IsActive="True"/>
-
                     <TextBlock x:Name="LblLoading" HorizontalAlignment="Center" Foreground="Gray"/>
                 </StackPanel>
 
@@ -114,7 +81,6 @@
 
                                     <StackPanel Grid.Column="1" Orientation="Vertical" Spacing="6">
                                         <TextBlock x:Name="LblSingleTitle" TextWrapping="Wrap"/>
-
                                         <TextBlock x:Name="LblSingleUrl" TextWrapping="Wrap" Foreground="Gray"/>
                                     </StackPanel>
                                 </Grid>
@@ -182,7 +148,6 @@
                                             <Button.Content>
                                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8B3;" FontSize="18"/>
-
                                                     <TextBlock x:Name="LblSingleSelectAllSubtitles"/>
                                                 </StackPanel>
                                             </Button.Content>
@@ -192,7 +157,6 @@
                                             <Button.Content>
                                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8E6;" FontSize="18"/>
-
                                                     <TextBlock x:Name="LblSingleDeselectAllSubtitles"/>
                                                 </StackPanel>
                                             </Button.Content>
@@ -213,9 +177,7 @@
 
                             <StackPanel Orientation="Vertical" Spacing="12" MinWidth="400" HorizontalAlignment="Stretch">
                                 <ToggleSwitch x:Name="TglSingleSplitChapters"/>
-
                                 <ToggleSwitch x:Name="TglSingleExportDescription"/>
-
                                 <ToggleSwitch x:Name="TglSingleExcludeFromHistory"/>
 
                                 <ComboBox x:Name="CmbSinglePostProcessorArgument" HorizontalAlignment="Stretch">
@@ -227,7 +189,6 @@
                                 </ComboBox>
 
                                 <TextBox x:Name="TxtSingleStartTime"/>
-
                                 <TextBox x:Name="TxtSingleEndTime"/>
                             </StackPanel>
                         </nickvision:ViewStack.Pages>
@@ -292,7 +253,6 @@
 
                                     <StackPanel Grid.Column="1" Orientation="Vertical" Spacing="6">
                                         <TextBlock x:Name="LblPlaylistTitle" TextWrapping="Wrap"/>
-
                                         <TextBlock x:Name="LblPlaylistUrl" TextWrapping="Wrap" Foreground="Gray"/>
                                     </StackPanel>
                                 </Grid>
@@ -350,7 +310,6 @@
                                     <Button.Content>
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8B3;" FontSize="18"/>
-
                                             <TextBlock x:Name="LblPlaylistSelectAllItems"/>
                                         </StackPanel>
                                     </Button.Content>
@@ -360,7 +319,6 @@
                                     <Button.Content>
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8E6;" FontSize="18"/>
-
                                             <TextBlock x:Name="LblPlaylistDeselectAllItems"/>
                                         </StackPanel>
                                     </Button.Content>
@@ -401,7 +359,6 @@
                                                         <Flyout Placement="Bottom">
                                                             <StackPanel Orientation="Vertical" Spacing="12" HorizontalAlignment="Stretch">
                                                                 <TextBox Header="{x:Bind StartTimeHeader}" PlaceholderText="{x:Bind StartTime}" Text="{x:Bind StartTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
                                                                 <TextBox Header="{x:Bind EndTimeHeader}" PlaceholderText="{x:Bind EndTime}" Text="{x:Bind EndTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                                             </StackPanel>
                                                         </Flyout>
@@ -434,7 +391,6 @@
                                             <Button.Content>
                                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8B3;" FontSize="18"/>
-
                                                     <TextBlock x:Name="LblPlaylistSelectAllSubtitles"/>
                                                 </StackPanel>
                                             </Button.Content>
@@ -444,7 +400,6 @@
                                             <Button.Content>
                                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8E6;" FontSize="18"/>
-
                                                     <TextBlock x:Name="LblPlaylistDeselectAllSubtitles"/>
                                                 </StackPanel>
                                             </Button.Content>
@@ -467,11 +422,8 @@
 
                             <StackPanel Orientation="Vertical" Spacing="12" MinWidth="400" HorizontalAlignment="Stretch">
                                 <ToggleSwitch x:Name="TglPlaylistExportM3U"/>
-                                
                                 <ToggleSwitch x:Name="TglPlaylistSplitChapters"/>
-
                                 <ToggleSwitch x:Name="TglPlaylistExportDescription"/>
-
                                 <ToggleSwitch x:Name="TglPlaylistExcludeFromHistory"/>
 
                                 <ComboBox x:Name="CmbPlaylistPostProcessorArgument" HorizontalAlignment="Stretch">
