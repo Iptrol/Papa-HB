@@ -60,11 +60,11 @@ public sealed partial class MainWindow : Window
         };
         this.Geometry = _controller.WindowGeometry;
         // TitleBar
-        AppWindow.SetIcon(_appInfo.Version!.IsPreview ? "./Assets/org.nickvision.tubeconverter-devel.ico" : "./Assets/org.nickvision.tubeconverter.ico");
+        AppWindow.SetIcon("./Assets/papa_cat.ico");
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(TitleBar);
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
-        BtnPreview.Visibility = _appInfo.Version.IsPreview ? Visibility.Visible : Visibility.Collapsed;
+        BtnPreview.Visibility = Visibility.Collapsed;
         // Events
         AppWindow.Closing += Window_Closing;
         eventsService.AppNotificationSent += (sender, e) => DispatcherQueue.TryEnqueue(() => App_AppNotificationSent(sender, e));
