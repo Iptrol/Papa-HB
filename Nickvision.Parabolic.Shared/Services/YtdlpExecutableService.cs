@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Nickvision.Desktop.Application;
 using Nickvision.Desktop.Filesystem;
 using Nickvision.Desktop.Keyring;
@@ -235,7 +235,6 @@ public class YtdlpExecutableService : DependencyExecutableService, IYtdlpExecuta
                 FrameRate.Fps60 => "60",
                 _ => string.Empty
             };
-
         }
         if (downloadOptions.FileType.ShouldRecode && _configurationService.PreferredVideoCodec == VideoCodec.Any)
         {
@@ -545,8 +544,15 @@ public class YtdlpExecutableService : DependencyExecutableService, IYtdlpExecuta
         }
         if (downloadOptions.TimeFrame is not null)
         {
+            var startSec = (long)downloadOptions.TimeFrame.Start.TotalSeconds;
+            var durSec = (long)downloadOptions.TimeFrame.Duration.TotalSeconds;
+            var ffmpegTimeArgs = $"-ss {startSec} -t {durSec}";
             arguments.Add("--postprocessor-args");
-            arguments.Add($"Merger+ffmpeg_i:-ss {downloadOptions.TimeFrame.Start} -t {downloadOptions.TimeFrame.Duration}");
+            arguments.Add($"Merger+ffmpeg_i:{ffmpegTimeArgs}");
+            arguments.Add("--postprocessor-args");
+            arguments.Add($"VideoRemuxer+ffmpeg_i:{ffmpegTimeArgs}");
+            arguments.Add("--postprocessor-args");
+            arguments.Add($"ExtractAudio+ffmpeg_i:{ffmpegTimeArgs}");
         }
         arguments.AddRange(_configurationService.YtdlpDownloadArgs.SplitCommandLine());
         return new Process()
