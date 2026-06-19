@@ -127,7 +127,7 @@ public sealed partial class MainWindow : Window
     {
         ViewStack.SelectedIndex = (int)Pages.Home;
         ViewStackDownloads.SelectedIndex = 0;
-        MenuCheckForUpdates.IsEnabled = false;
+        MenuCheckForUpdates.Visibility = Visibility.Collapsed;
         var updatesTask = _controller.CheckForUpdatesAsync(false);
         if (_controller.ShowDisclaimerOnStartup)
         {
@@ -189,7 +189,6 @@ public sealed partial class MainWindow : Window
             await AddDownloadAsync(_controller.UrlFromArgs);
         }
         await updatesTask;
-        MenuCheckForUpdates.IsEnabled = true;
     }
 
     private async void Window_Closing(AppWindow sender, AppWindowClosingEventArgs e)
@@ -457,9 +456,8 @@ public sealed partial class MainWindow : Window
 
     private async void CheckForUpdates(object? sender, RoutedEventArgs e)
     {
-        MenuCheckForUpdates.IsEnabled = false;
+        MenuCheckForUpdates.Visibility = Visibility.Collapsed;
         await _controller.CheckForUpdatesAsync(true);
-        MenuCheckForUpdates.IsEnabled = true;
     }
 
     private void ClearAllCompleted(object? sender, RoutedEventArgs e)
