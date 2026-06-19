@@ -83,7 +83,6 @@ public sealed partial class MainWindow : Window
         MenuAddDownload.Text = "Добавить загрузку";
         MenuExit.Text = "Выход";
         MenuEdit.Title = "Правка";
-        MenuKeyring.Text = "Связка ключей";
         MenuSettings.Text = "Настройки";
         MenuView.Title = "Вид";
         MenuHistory.Text = "История";
@@ -92,12 +91,9 @@ public sealed partial class MainWindow : Window
         MenuRetryAllFailed.Text = "Повторить неудачные";
         MenuClearAllQueued.Text = "Очистить очередь";
         MenuClearAllCompleted.Text = "Очистить завершённые";
-        ToolTipService.SetToolTip(BtnPreview, "Вы используете предварительную версию программы");
-        LblPreview.Text = "Спасибо за тестирование! ❤️";
         LblHomeTitle.Text = "Привет, папа! 👋 Ну что, давай качать интересные видосы в дорогу? 🎬";
         LblHomeDescription.Text = "Вставь ссылку на видео или музыку с YouTube — и скачивай!";
         LblAddDownload.Text = "Добавить ссылку";
-        LblKeyring.Text = "Связка ключей";
         LblSettings.Text = "Настройки";
         BtnStopAllRemaining.Label = "Остановить все";
         BtnRetryAllFailed.Label = "Повторить неудачные";
@@ -396,7 +392,7 @@ public sealed partial class MainWindow : Window
 
     private async void AddDownload(object? sender, RoutedEventArgs e) => await AddDownloadAsync(null);
 
-    private void Exit(object sender, RoutedEventArgs args) => Window_Closing(AppWindow, null);
+    private void Exit(object sender, RoutedEventArgs args) => Window_Closing(AppWindow, null!);
 
     private async void Keyring(object sender, RoutedEventArgs args)
     {
