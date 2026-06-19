@@ -29,7 +29,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <ImageIcon Grid.Column="0" VerticalAlignment="Center" Height="18" Source="/Assets/org.nickvision.tubeconverter.ico"/>
+                    <ImageIcon Grid.Column="0" VerticalAlignment="Center" Height="18" Source="/Assets/papa_cat.ico"/>
 
                     <TextBlock x:Name="LblTitle" Grid.Column="1" Margin="12,0,6,0" VerticalAlignment="Center" Style="{ThemeResource CaptionTextBlockStyle}"/>
 
@@ -39,21 +39,16 @@
                                 <MenuFlyoutItem.KeyboardAccelerators>
                                     <KeyboardAccelerator Key="N" Modifiers="Control"/>
                                 </MenuFlyoutItem.KeyboardAccelerators>
-
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
-
                             <MenuFlyoutSeparator/>
-
                             <MenuFlyoutItem x:Name="MenuExit" Click="Exit">
                                 <MenuFlyoutItem.KeyboardAccelerators>
                                     <KeyboardAccelerator Key="F4" Modifiers="Menu"/>
-
                                     <KeyboardAccelerator Key="Q" Modifiers="Control"/>
                                 </MenuFlyoutItem.KeyboardAccelerators>
-
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
                                 </MenuFlyoutItem.Icon>
@@ -65,17 +60,14 @@
                                 <MenuFlyoutItem.KeyboardAccelerators>
                                     <KeyboardAccelerator Key="K" Modifiers="Control"/>
                                 </MenuFlyoutItem.KeyboardAccelerators>
-
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE72E;"/>
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
-
                             <MenuFlyoutItem x:Name="MenuSettings" Click="Settings">
                                 <MenuFlyoutItem.KeyboardAccelerators>
                                     <KeyboardAccelerator Key="I" Modifiers="Control"/>
                                 </MenuFlyoutItem.KeyboardAccelerators>
-
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE713;"/>
                                 </MenuFlyoutItem.Icon>
@@ -87,7 +79,6 @@
                                 <MenuFlyoutItem.KeyboardAccelerators>
                                     <KeyboardAccelerator Key="H" Modifiers="Control"/>
                                 </MenuFlyoutItem.KeyboardAccelerators>
-
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE81C;"/>
                                 </MenuFlyoutItem.Icon>
@@ -99,77 +90,27 @@
                                 <MenuFlyoutItem.KeyboardAccelerators>
                                     <KeyboardAccelerator Key="S" Modifiers="Control,Shift"/>
                                 </MenuFlyoutItem.KeyboardAccelerators>
-
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE71A;"/>
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
-
                             <MenuFlyoutItem x:Name="MenuRetryAllFailed" Click="RetryAllFailed">
                                 <MenuFlyoutItem.KeyboardAccelerators>
                                     <KeyboardAccelerator Key="R" Modifiers="Control,Shift"/>
                                 </MenuFlyoutItem.KeyboardAccelerators>
-
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE72C;"/>
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
-
                             <MenuFlyoutSeparator/>
-
                             <MenuFlyoutItem x:Name="MenuClearAllQueued" Click="ClearAllQueued">
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
-
                             <MenuFlyoutItem x:Name="MenuClearAllCompleted" Click="ClearAllCompleted">
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                        </MenuBarItem>
-
-                        <MenuBarItem x:Name="MenuHelp">
-                            <MenuFlyoutItem x:Name="MenuCheckForUpdates" Click="CheckForUpdates">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xF0C5;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-
-                            <MenuFlyoutSeparator/>
-
-                            <MenuFlyoutItem x:Name="MenuGitHubRepo" Click="GitHubRepo">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE8F1;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-
-                            <MenuFlyoutItem x:Name="MenuReportABug" Click="ReportABug">
-                                <MenuFlyoutItem.KeyboardAccelerators>
-                                    <KeyboardAccelerator Key="I" Modifiers="Control,Shift"/>
-                                </MenuFlyoutItem.KeyboardAccelerators>
-
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xEBE8;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-
-                            <MenuFlyoutItem x:Name="MenuDiscussions" Click="Discussions">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE8F2;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-
-                            <MenuFlyoutSeparator/>
-
-                            <MenuFlyoutItem x:Name="MenuAbout" Click="About">
-                                <MenuFlyoutItem.KeyboardAccelerators>
-                                    <KeyboardAccelerator Key="F1" Modifiers="None"/>
-                                </MenuFlyoutItem.KeyboardAccelerators>
-
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE946;"/>
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
                         </MenuBarItem>
@@ -183,7 +124,6 @@
                         <Button.Content>
                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18" Glyph="&#xE794;"/>
                         </Button.Content>
-
                         <Button.Flyout>
                             <Flyout>
                                 <TextBlock x:Name="LblPreview" TextWrapping="Wrap"/>
@@ -195,7 +135,6 @@
                         <Button.Content>
                             <ProgressRing x:Name="RingUpdateProcess" Width="24" Height="24" IsIndeterminate="False"/>
                         </Button.Content>
-
                         <Button.Flyout>
                             <Flyout x:Name="FlyoutUpdateProgress" Placement="Bottom">
                                 <TextBlock x:Name="LblUpdateProgress" TextWrapping="WrapWholeWords"/>
@@ -212,37 +151,29 @@
             <nickvision:ViewStack x:Name="ViewStack" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <nickvision:ViewStack.Pages>
                     <StackPanel Margin="48,48,48,48" HorizontalAlignment="Stretch" Orientation="Vertical" Spacing="12">
-                        <Image HorizontalAlignment="Left" Width="64" Height="64" Source="/Assets/org.nickvision.tubeconverter.ico"/>
-
+                        <Image HorizontalAlignment="Left" Width="64" Height="64" Source="/Assets/papa_cat.ico"/>
                         <TextBlock x:Name="LblHomeTitle" HorizontalAlignment="Left" Style="{ThemeResource TitleTextBlockStyle}"/>
-
                         <TextBlock x:Name="LblHomeDescription" HorizontalAlignment="Left" Foreground="Gray"/>
-
                         <HyperlinkButton Margin="0,24,0,0" Click="AddDownload">
                             <HyperlinkButton.Content>
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
-
                                     <TextBlock x:Name="LblAddDownload"/>
                                 </StackPanel>
                             </HyperlinkButton.Content>
                         </HyperlinkButton>
-
                         <HyperlinkButton Click="Keyring">
                             <HyperlinkButton.Content>
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE72E;"/>
-
                                     <TextBlock x:Name="LblKeyring"/>
                                 </StackPanel>
                             </HyperlinkButton.Content>
                         </HyperlinkButton>
-
                         <HyperlinkButton Click="Settings">
                             <HyperlinkButton.Content>
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE713;"/>
-
                                     <TextBlock x:Name="LblSettings"/>
                                 </StackPanel>
                             </HyperlinkButton.Content>
@@ -267,7 +198,6 @@
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                         <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
-
                                         <TextBlock x:Name="LblDownloadsAddDownload"/>
                                     </StackPanel>
                                 </Button.Content>
@@ -280,23 +210,19 @@
                                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE71A;"/>
                                         </AppBarButton.Icon>
                                     </AppBarButton>
-
                                     <AppBarButton x:Name="BtnRetryAllFailed" Click="RetryAllFailed">
                                         <AppBarButton.Icon>
                                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE72C;"/>
                                         </AppBarButton.Icon>
                                     </AppBarButton>
-
                                     <AppBarSeparator/>
                                 </CommandBar.PrimaryCommands>
-
                                 <CommandBar.SecondaryCommands>
                                     <AppBarButton x:Name="BtnClearAllQueued" Click="ClearAllQueued">
                                         <AppBarButton.Icon>
                                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
                                         </AppBarButton.Icon>
                                     </AppBarButton>
-
                                     <AppBarButton x:Name="BtnClearAllCompleted" Click="ClearAllCompleted">
                                         <AppBarButton.Icon>
                                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
@@ -321,47 +247,38 @@
                                     <NavigationViewItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE71D;"/>
                                     </NavigationViewItem.Icon>
-
                                     <NavigationViewItem.InfoBadge>
                                         <InfoBadge x:Name="InfoBadgeDownloadsAll" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
                                     </NavigationViewItem.InfoBadge>
                                 </NavigationViewItem>
-
                                 <NavigationViewItem x:Name="NavDownloadsRunning" Tag="1">
                                     <NavigationViewItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE768;"/>
                                     </NavigationViewItem.Icon>
-
                                     <NavigationViewItem.InfoBadge>
                                         <InfoBadge x:Name="InfoBadgeDownloadsRunning" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
                                     </NavigationViewItem.InfoBadge>
                                 </NavigationViewItem>
-
                                 <NavigationViewItem x:Name="NavDownloadsQueued" Tag="2">
                                     <NavigationViewItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE917;"/>
                                     </NavigationViewItem.Icon>
-
                                     <NavigationViewItem.InfoBadge>
                                         <InfoBadge x:Name="InfoBadgeDownloadsQueued" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
                                     </NavigationViewItem.InfoBadge>
                                 </NavigationViewItem>
-
                                 <NavigationViewItem x:Name="NavDownloadsCompleted" Tag="3">
                                     <NavigationViewItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE73E;"/>
                                     </NavigationViewItem.Icon>
-
                                     <NavigationViewItem.InfoBadge>
                                         <InfoBadge x:Name="InfoBadgeDownloadsCompleted" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
                                     </NavigationViewItem.InfoBadge>
                                 </NavigationViewItem>
-
                                 <NavigationViewItem x:Name="NavDownloadsFailed" Tag="4">
                                     <NavigationViewItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE783;"/>
                                     </NavigationViewItem.Icon>
-
                                     <NavigationViewItem.InfoBadge>
                                         <InfoBadge x:Name="InfoBadgeDownloadsFailed" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
                                     </NavigationViewItem.InfoBadge>
@@ -377,14 +294,12 @@
                                                     <Button.Content>
                                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                                             <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
-
                                                             <TextBlock x:Name="LblNoneAddDownload"/>
                                                         </StackPanel>
                                                     </Button.Content>
                                                 </Button>
                                             </nickvision:StatusPage.Child>
                                         </nickvision:StatusPage>
-
                                         <ItemsRepeater x:Name="ListDownloads" Margin="12,6,12,0">
                                             <ItemsRepeater.Layout>
                                                 <StackLayout Spacing="6"/>
@@ -410,11 +325,8 @@
         <ContentDialog x:Name="DlgCredential" DefaultButton="Primary">
             <StackPanel Orientation="Vertical" Spacing="12">
                 <TextBlock x:Name="LblCredentialRequired"/>
-
                 <TextBox x:Name="TxtCredentialUrl" IsReadOnly="True"/>
-
                 <TextBox x:Name="TxtCredentialUsername"/>
-
                 <PasswordBox x:Name="TxtCredentialPassword"/>
             </StackPanel>
         </ContentDialog>
