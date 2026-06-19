@@ -1,8 +1,3 @@
-Зрозуміло! Ти вставила весь мій текст відповіді включно з поясненням і markdown — а не тільки XML код. Рядок 1 там "Бачу помилку — рядок 3:" 😄
-
-Натисни олівець, **виділи весь текст** (Ctrl+A) і вставте тільки це — без жодного тексту до і після:
-
-```xml
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
@@ -68,4 +63,3 @@
 	</PropertyGroup>
 	<Import Project="..\Nickvision.Common.targets" />
 </Project>
-```
