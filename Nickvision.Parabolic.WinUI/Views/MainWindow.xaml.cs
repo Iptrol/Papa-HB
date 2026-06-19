@@ -1,3 +1,4 @@
+```csharp
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Windowing;
@@ -128,7 +129,6 @@ public sealed partial class MainWindow : Window
         ViewStack.SelectedIndex = (int)Pages.Home;
         ViewStackDownloads.SelectedIndex = 0;
         MenuCheckForUpdates.Visibility = Visibility.Collapsed;
-        var updatesTask = _controller.CheckForUpdatesAsync(false);
         if (_controller.ShowDisclaimerOnStartup)
         {
             var checkBox = new CheckBox()
@@ -188,7 +188,6 @@ public sealed partial class MainWindow : Window
         {
             await AddDownloadAsync(_controller.UrlFromArgs);
         }
-        await updatesTask;
     }
 
     private async void Window_Closing(AppWindow sender, AppWindowClosingEventArgs e)
@@ -570,3 +569,4 @@ public sealed partial class MainWindow : Window
         InfoBadgeDownloadsFailed.Visibility = _controller.FailedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 }
+```
