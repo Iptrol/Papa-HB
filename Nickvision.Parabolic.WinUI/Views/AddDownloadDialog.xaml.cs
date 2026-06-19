@@ -67,20 +67,6 @@ public sealed partial class AddDownloadDialog : ContentDialog
         IsPrimaryButtonEnabled = false;
         TxtUrl.Header = "Ссылка на видео";
         TxtUrl.PlaceholderText = "Вставь ссылку сюда";
-        LblSelectBatchFile.Text = _translationService._("Select Batch File");
-        TglUseAuthentication.OnContent = _translationService._("Use Authentication");
-        TglUseAuthentication.OffContent = _translationService._("Use Authentication");
-        CmbCredential.Header = _translationService._("Credential");
-        TxtUsername.Header = _translationService._("Username");
-        TxtUsername.PlaceholderText = _translationService._("Enter username here");
-        TxtPassword.Header = _translationService._("Password");
-        TxtPassword.PlaceholderText = _translationService._("Enter password here");
-        TglDownloadImmediatelyAsVideo.OnContent = _translationService._("Download Immediately as Video");
-        TglDownloadImmediatelyAsVideo.OffContent = _translationService._("Download Immediately as Video");
-        TglDownloadImmediatelyAsAudio.OnContent = _translationService._("Download Immediately as Audio");
-        TglDownloadImmediatelyAsAudio.OffContent = _translationService._("Download Immediately as Audio");
-        TeachDownloadImmediately.Title = "Внимание";
-        TeachDownloadImmediately.Subtitle = "Файл будет скачан с настройками по умолчанию без показа дополнительных параметров.";
         LblLoading.Text = "Загружаем информацию, подожди...";
         NavViewItemSingleGeneral.Text = "Общее";
         NavViewItemSingleSubtitles.Text = "Субтитры";
@@ -146,11 +132,7 @@ public sealed partial class AddDownloadDialog : ContentDialog
 
     public async new Task<ContentDialogResult> ShowAsync()
     {
-        CmbCredential.ItemsSource = (await _controller.GetAvailableCredentialsAsync()).ToBindableSelectonItems();
-        CmbCredential.SelectSelectionItem();
         ViewStack.SelectedIndex = (int)Pages.Discover;
-        TglDownloadImmediatelyAsVideo.IsOn = _controller.PreviousDownloadImmediatelyAsVideo;
-        TglDownloadImmediatelyAsAudio.IsOn = _controller.PreviousDownloadImmediatelyAsAudio;
         if (string.IsNullOrEmpty(TxtUrl.Text))
         {
             if (Clipboard.GetContent().Contains(StandardDataFormats.Text))
@@ -203,18 +185,7 @@ public sealed partial class AddDownloadDialog : ContentDialog
 
     private async Task DiscoverMediaAsync(CancellationToken cancellationToken)
     {
-        Credential? credential = null;
-        if (!string.IsNullOrEmpty(TxtUsername.Text) || !string.IsNullOrEmpty(TxtPassword.Password))
-        {
-            credential = new Credential("manual", TxtUsername.Text, TxtPassword.Password);
-        }
-        else
-        {
-            credential = (CmbCredential.SelectedItem as BindableSelectionItem)!.ToSelectionItem<Credential?>()!.Value;
-        }
-        _controller.PreviousDownloadImmediatelyAsVideo = TglDownloadImmediatelyAsVideo.IsOn;
-        _controller.PreviousDownloadImmediatelyAsAudio = TglDownloadImmediatelyAsAudio.IsOn;
-        _discoveryContext = await _controller.DiscoverAsync(new Uri(TxtUrl.Text), credential, cancellationToken);
+        _discoveryContext = await _controller.DiscoverAsync(new Uri(TxtUrl.Text), null, cancellationToken);
         if (_discoveryContext is null)
         {
             Hide();
@@ -256,11 +227,6 @@ public sealed partial class AddDownloadDialog : ContentDialog
             TxtSingleStartTime.Text = _discoveryContext.Items[0].StartTime;
             TxtSingleEndTime.PlaceholderText = _discoveryContext.Items[0].EndTime;
             TxtSingleEndTime.Text = _discoveryContext.Items[0].EndTime;
-            if (TglDownloadImmediatelyAsVideo.IsOn || TglDownloadImmediatelyAsAudio.IsOn)
-            {
-                await DownloadSingleAsync();
-                Hide();
-            }
         }
         else
         {
@@ -290,11 +256,6 @@ public sealed partial class AddDownloadDialog : ContentDialog
             TglPlaylistExportDescription.IsOn = _controller.PreviousExportDescription;
             CmbPlaylistPostProcessorArgument.ItemsSource = _controller.GetAvailablePostProcessorArguments().ToBindableSelectonItems();
             CmbPlaylistPostProcessorArgument.SelectSelectionItem();
-            if (TglDownloadImmediatelyAsVideo.IsOn || TglDownloadImmediatelyAsAudio.IsOn)
-            {
-                await DownloadPlaylistAsync();
-                Hide();
-            }
         }
     }
 
@@ -337,47 +298,6 @@ public sealed partial class AddDownloadDialog : ContentDialog
     }
 
     private void TxtUrl_TextChanged(object? sender, TextChangedEventArgs e) => IsPrimaryButtonEnabled = !TxtUrl.Text.StartsWith("//") && Uri.TryCreate(TxtUrl.Text, UriKind.Absolute, out var _);
-
-    private async void BtnSelectBatchFile_Click(object? sender, RoutedEventArgs e)
-    {
-        var picker = new FileOpenPicker(WindowId!.Value)
-        {
-            SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
-            FileTypeFilter = { ".txt" }
-        };
-        var file = await picker.PickSingleFileAsync();
-        if (file is not null)
-        {
-            TxtUrl.Text = new Uri(file.Path).ToString();
-        }
-    }
-
-    private void CmbCredential_SelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        var visibility = (CmbCredential.SelectedItem as BindableSelectionItem)!.ToSelectionItem<Credential?>()!.Value is null ? Visibility.Visible : Visibility.Collapsed;
-        TxtUsername.Visibility = visibility;
-        TxtPassword.Visibility = visibility;
-    }
-
-    private void TglDownloadImmediatelyAsVideo_Toggled(object? sender, RoutedEventArgs e)
-    {
-        if (TglDownloadImmediatelyAsVideo.IsOn)
-        {
-            TglDownloadImmediatelyAsAudio.IsOn = false;
-            TeachDownloadImmediately.Target = TglDownloadImmediatelyAsVideo;
-            TeachDownloadImmediately.IsOpen = _controller.GetShouldShowDownloadImmediatelyTeach();
-        }
-    }
-
-    private void TglDownloadImmediatelyAsAudio_Toggled(object? sender, RoutedEventArgs e)
-    {
-        if (TglDownloadImmediatelyAsAudio.IsOn)
-        {
-            TglDownloadImmediatelyAsVideo.IsOn = false;
-            TeachDownloadImmediately.Target = TglDownloadImmediatelyAsAudio;
-            TeachDownloadImmediately.IsOpen = _controller.GetShouldShowDownloadImmediatelyTeach();
-        }
-    }
 
     private void NavViewSingle_SelectionChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
     {
@@ -491,10 +411,7 @@ public sealed partial class AddDownloadDialog : ContentDialog
 
     private void TxtSingleSubtitlesSearch_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs e)
     {
-        if (_discoveryContext is null)
-        {
-            return;
-        }
+        if (_discoveryContext is null) return;
         var searchText = TxtSingleSubtitlesSearch.Text.Trim();
         _isUpdatingSubtitleSelection = true;
         ListSingleSubtitles.ItemsSource = string.IsNullOrEmpty(searchText) ? _discoveryContext.SubtitleLanguages.ToBindableSelectonItems() : _discoveryContext.SubtitleLanguages.Where(x => x.Value.Language.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToBindableSelectonItems();
@@ -504,10 +421,7 @@ public sealed partial class AddDownloadDialog : ContentDialog
 
     private void TxtPlaylistSubtitlesSearch_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs e)
     {
-        if (_discoveryContext is null)
-        {
-            return;
-        }
+        if (_discoveryContext is null) return;
         var searchText = TxtPlaylistSubtitlesSearch.Text.Trim();
         _isUpdatingSubtitleSelection = true;
         ListPlaylistSubtitles.ItemsSource = string.IsNullOrEmpty(searchText) ? _discoveryContext.SubtitleLanguages.ToBindableSelectonItems() : _discoveryContext.SubtitleLanguages.Where(x => x.Value.Language.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToBindableSelectonItems();
@@ -517,10 +431,7 @@ public sealed partial class AddDownloadDialog : ContentDialog
 
     private void ListSubtitles_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (_isUpdatingSubtitleSelection)
-        {
-            return;
-        }
+        if (_isUpdatingSubtitleSelection) return;
         foreach (var item in e.AddedItems)
         {
             (item as BindableSelectionItem)!.ShouldSelect = true;
