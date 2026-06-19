@@ -8,6 +8,13 @@
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Акцентний колір: морська хвиля -->
+            <Color x:Key="SystemAccentColor">#0097A7</Color>
+            <Color x:Key="SystemAccentColorLight1">#26C6DA</Color>
+            <Color x:Key="SystemAccentColorLight2">#80DEEA</Color>
+            <Color x:Key="SystemAccentColorDark1">#00838F</Color>
+            <Color x:Key="SystemAccentColorDark2">#006064</Color>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
