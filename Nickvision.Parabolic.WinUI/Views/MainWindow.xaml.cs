@@ -1,4 +1,3 @@
-```csharp
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Windowing;
@@ -93,10 +92,6 @@ public sealed partial class MainWindow : Window
         MenuRetryAllFailed.Text = "Повторить неудачные";
         MenuClearAllQueued.Text = "Очистить очередь";
         MenuClearAllCompleted.Text = "Очистить завершённые";
-        MenuHelp.Title = "Помощь";
-        MenuCheckForUpdates.Text = "Проверить обновления";
-        MenuReportABug.Text = "Сообщить об ошибке";
-        MenuAbout.Text = "О программе";
         ToolTipService.SetToolTip(BtnPreview, "Вы используете предварительную версию программы");
         LblPreview.Text = "Спасибо за тестирование! ❤️";
         LblHomeTitle.Text = "Привет, папа! 👋 Ну что, давай качать интересные видосы в дорогу? 🎬";
@@ -128,7 +123,6 @@ public sealed partial class MainWindow : Window
     {
         ViewStack.SelectedIndex = (int)Pages.Home;
         ViewStackDownloads.SelectedIndex = 0;
-        MenuCheckForUpdates.Visibility = Visibility.Collapsed;
         if (_controller.ShowDisclaimerOnStartup)
         {
             var checkBox = new CheckBox()
@@ -233,13 +227,7 @@ public sealed partial class MainWindow : Window
             NotificationSeverity.Error => InfoBarSeverity.Error,
             _ => InfoBarSeverity.Informational
         };
-        if (e.Notification.Action == "update")
-        {
-            BtnInfoBar.Content = "Обновить";
-            _notificationClickHandler = WindowsUpdate;
-            BtnInfoBar.Click += _notificationClickHandler;
-        }
-        else if (e.Notification.Action == "update-ytdlp")
+        if (e.Notification.Action == "update-ytdlp")
         {
             BtnInfoBar.Content = "Обновить";
             _notificationClickHandler = YtdlpUpdate;
@@ -406,24 +394,6 @@ public sealed partial class MainWindow : Window
         });
     }
 
-    private async void About(object? sender, RoutedEventArgs e)
-    {
-        var progressDialog = new ContentDialog()
-        {
-            Title = "О программе",
-            Content = new ProgressRing() { IsActive = true },
-            RequestedTheme = MainGrid.ActualTheme,
-            XamlRoot = MainGrid.XamlRoot
-        };
-        DispatcherQueue.TryEnqueue(async () => await progressDialog.ShowAsync());
-        var aboutDialog = _serviceProvider.GetRequiredService<AboutDialog>();
-        aboutDialog.DebugInformation = await _controller.GetDebugInformationAsync();
-        aboutDialog.RequestedTheme = MainGrid.ActualTheme;
-        aboutDialog.XamlRoot = MainGrid.XamlRoot;
-        progressDialog.Hide();
-        await aboutDialog.ShowAsync();
-    }
-
     private async void AddDownload(object? sender, RoutedEventArgs e) => await AddDownloadAsync(null);
 
     private void Exit(object sender, RoutedEventArgs args) => Window_Closing(AppWindow, null);
@@ -453,12 +423,6 @@ public sealed partial class MainWindow : Window
         await historyDialog.ShowAsync();
     }
 
-    private async void CheckForUpdates(object? sender, RoutedEventArgs e)
-    {
-        MenuCheckForUpdates.Visibility = Visibility.Collapsed;
-        await _controller.CheckForUpdatesAsync(true);
-    }
-
     private void ClearAllCompleted(object? sender, RoutedEventArgs e)
     {
         foreach (var id in _controller.ClearCompletedDownloads())
@@ -485,12 +449,6 @@ public sealed partial class MainWindow : Window
         await _controller.DenoUpdateAsync(progress);
         progress.ProgressChanged -= UpdateProgress_Changed;
     }
-
-    private async void Discussions(object? sender, RoutedEventArgs e) => await LaunchUriAsync(_appInfo.DiscussionsForum);
-
-    private async void GitHubRepo(object? sender, RoutedEventArgs e) => await LaunchUriAsync(_appInfo.SourceRepository);
-
-    private async void ReportABug(object? sender, RoutedEventArgs e) => await LaunchUriAsync(_appInfo.IssueTracker);
 
     private async void RetryAllFailed(object? sender, RoutedEventArgs e) => await _controller.RetryFailedDownloadsAsync();
 
@@ -569,4 +527,3 @@ public sealed partial class MainWindow : Window
         InfoBadgeDownloadsFailed.Visibility = _controller.FailedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 }
-```
