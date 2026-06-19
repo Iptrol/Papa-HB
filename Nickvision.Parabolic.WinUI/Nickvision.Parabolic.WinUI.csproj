@@ -1,7 +1,17 @@
+Бачу помилку — рядок 3:
+
+```xml
+<TargetFramework>net10.0-windows10.0.19041.0</TargetFrameworks>
+```
+
+Відкриваючий тег `<TargetFramework>` але закриваючий `</TargetFrameworks>` — не збігаються. Моя помилка з минулого разу.
+
+Виправлений файл:
+
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net10.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -65,3 +75,5 @@
 	<Import Project="..\Nickvision.Common.targets" />
 </Project>
 ```
+
+Комітай — збірка має пройти.
