@@ -77,8 +77,8 @@ public sealed partial class MainWindow : Window
         eventsService.DownloadRetired += (sender, e) => DispatcherQueue.TryEnqueue(() => Controller_DownloadRetired(sender, e));
         eventsService.DownloadRequested += async (s, args) => await AddDownloadAsync(args.Url);
         // Translations
-        AppWindow.Title = "Папа & Куницкие Кооперейшн 🌊";
-        LblTitle.Text = "Папа & Куницкие Кооперейшн 🌊";
+        AppWindow.Title = "Папа Качай ❤️";
+        LblTitle.Text = "Папа Качай ❤️";
         MenuFile.Title = "Файл";
         MenuAddDownload.Text = "Добавить загрузку";
         MenuExit.Text = "Выход";
@@ -91,7 +91,7 @@ public sealed partial class MainWindow : Window
         MenuRetryAllFailed.Text = "Повторить неудачные";
         MenuClearAllQueued.Text = "Очистить очередь";
         MenuClearAllCompleted.Text = "Очистить завершённые";
-        LblHomeTitle.Text = "Привет, папа! 👋 Ну что, давай качать интересные видосы в дорогу? 🎬";
+        LblHomeTitle.Text = "Привет, папа! 👋 Ну что, давай качать интересные видосы? 🎬\n\nТвои Лена, Саша и Фреди";
         LblHomeDescription.Text = "Вставь ссылку на видео или музыку с YouTube — и скачивай!";
         LblAddDownload.Text = "Добавить ссылку";
         LblSettings.Text = "Настройки";
@@ -187,7 +187,7 @@ public sealed partial class MainWindow : Window
             e?.Cancel = true;
             var confirmDialog = new ContentDialog()
             {
-                Title = "Папа & Куницкие Кооперейшн 🌊",
+                Title = "Папа Качай ❤️",
                 Content = "Есть незавершённые загрузки. Остановить их и выйти?",
                 PrimaryButtonText = "Да, выйти",
                 CloseButtonText = "Нет, подождать",
