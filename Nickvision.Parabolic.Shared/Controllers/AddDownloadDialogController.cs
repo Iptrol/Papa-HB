@@ -1,354 +1,449 @@
-using CommunityToolkit.WinUI;
-using Microsoft.UI;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.Windows.Storage.Pickers;
+using Microsoft.Extensions.Logging;
+using Nickvision.Desktop.Application;
 using Nickvision.Desktop.Globalization;
 using Nickvision.Desktop.Keyring;
-using Nickvision.Desktop.WinUI.Helpers;
-using Nickvision.Parabolic.Shared.Controllers;
+using Nickvision.Desktop.Notifications;
+using Nickvision.Parabolic.Shared.Helpers;
 using Nickvision.Parabolic.Shared.Models;
-using Nickvision.Parabolic.WinUI.Helpers;
+using Nickvision.Parabolic.Shared.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Graphics.Imaging;
 
-namespace Nickvision.Parabolic.WinUI.Views;
+namespace Nickvision.Parabolic.Shared.Controllers;
 
-public sealed partial class AddDownloadDialog : ContentDialog
+public class AddDownloadDialogController
 {
-    private enum Pages
-    {
-        Discover = 0,
-        Loading,
-        Single,
-        Playlist
-    }
+    private static AddDownloadTeachType _shownTeachTypeFlag;
 
-    private enum SinglePages
-    {
-        General = 0,
-        Advanced
-    }
-
-    private enum PlaylistPages
-    {
-        General = 0,
-        Items,
-        Advanced
-    }
-
-    private readonly AddDownloadDialogController _controller;
+    private readonly ILogger<AddDownloadDialogController> _logger;
+    private readonly IConfigurationService _configurationService;
+    private readonly IDiscoveryService _discoveryService;
+    private readonly IDownloadService _downloadService;
+    private readonly IKeyringService _keyringService;
+    private readonly INotificationService _notificationService;
+    private readonly IThumbnailService _thumbnailService;
     private readonly ITranslationService _translationService;
-    private DiscoveryContext? _discoveryContext;
+    private readonly Dictionary<int, DiscoveryContext> _discoveryContextMap;
 
-    public WindowId? WindowId { get; set; }
+    public Dictionary<MediaFileType, string> PreviousAudioFormatIds => _configurationService.PreviousAudioFormatIds;
+    public bool PreviousExportDescription => _configurationService.PreviousExportDescription;
+    public bool PreviousExportM3U => _configurationService.PreviousExportM3U;
+    public bool PreviousNumberTitles => _configurationService.PreviousNumberTitles;
+    public bool PreviousReverseDownloadOrder => _configurationService.PreviousReverseDownloadOrder;
+    public string PreviousSaveFolder => _configurationService.PreviousSaveFolder;
+    public bool PreviousSplitChapters => _configurationService.PreviousSplitChapters;
+    public Dictionary<MediaFileType, string> PreviousVideoFormatIds => _configurationService.PreviousVideoFormatIds;
 
-    public AddDownloadDialog(AddDownloadDialogController controller, ITranslationService translationService)
+    public AddDownloadDialogController(ILogger<AddDownloadDialogController> logger, IConfigurationService configurationService, IDiscoveryService discoveryService, IDownloadService downloadService, IKeyringService keyringService, INotificationService notificationService, IThumbnailService thumbnailService, ITranslationService translationService)
     {
-        InitializeComponent();
-        _controller = controller;
+        _logger = logger;
+        _configurationService = configurationService;
+        _discoveryService = discoveryService;
+        _downloadService = downloadService;
+        _keyringService = keyringService;
+        _notificationService = notificationService;
+        _thumbnailService = thumbnailService;
         _translationService = translationService;
-        _discoveryContext = null;
-        Title = "Добавить загрузку";
-        PrimaryButtonText = "Найти";
-        CloseButtonText = "Отмена";
-        DefaultButton = ContentDialogButton.Primary;
-        IsPrimaryButtonEnabled = false;
-        TxtUrl.Header = "Ссылка на видео";
-        TxtUrl.PlaceholderText = "Вставь ссылку сюда";
-        LblLoading.Text = "Загружаем информацию, подожди...";
-        NavViewItemSingleGeneral.Text = "Общее";
-        NavViewItemSingleAdvanced.Text = "Дополнительно";
-        TxtSingleSaveFilename.Header = "Название файла";
-        ToolTipService.SetToolTip(BtnSingleRevertFilename, "Вернуть оригинальное название");
-        TxtSingleSaveFolder.Header = "Папка для сохранения";
-        ToolTipService.SetToolTip(BtnSingleSelectSaveFolder, "Выбрать папку");
-        CmbSingleFileType.Header = "Формат файла";
-        TeachSingleFileType.Title = "Внимание";
-        TeachSingleFileType.Subtitle = "Некоторые форматы не поддерживают встроенные субтитры и обложки.";
-        CmbSingleVideoFormat.Header = "Качество видео";
-        CmbSingleAudioFormat.Header = "Качество аудио";
-        TxtSingleStartTime.Header = "Время начала";
-        TxtSingleEndTime.Header = "Время конца";
-        NavViewItemPlaylistGeneral.Text = "Общее";
-        NavViewItemPlaylistItems.Text = "Видео";
-        NavViewItemPlaylistAdvanced.Text = "Дополнительно";
-        TxtPlaylistSaveFolder.Header = "Папка для сохранения";
-        ToolTipService.SetToolTip(BtnPlaylistSelectSaveFolder, "Выбрать папку");
-        CmbPlaylistFileType.Header = "Формат файла";
-        TeachPlaylistFileType.Title = "Внимание";
-        TeachPlaylistFileType.Subtitle = "Некоторые форматы не поддерживают встроенные субтитры и обложки.";
-        CmbPlaylistSuggestedVideoResolution.Header = "Качество видео";
-        CmbPlaylistSuggestedAudioBitrate.Header = "Качество аудио";
-        LblPlaylistSelectAllItems.Text = "Выбрать все";
-        LblPlaylistDeselectAllItems.Text = "Снять выбор";
-        TglPlaylistReverseDownloadOrder.OnContent = "Обратный порядок загрузки";
-        TglPlaylistReverseDownloadOrder.OffContent = "Обратный порядок загрузки";
-        TglPlaylistNumberTitles.OnContent = "Нумеровать названия";
-        TglPlaylistNumberTitles.OffContent = "Нумеровать названия";
-        TeachPlaylistNumberTitles.Title = "Внимание";
-        TeachPlaylistNumberTitles.Subtitle = "Нумерация будет применена к выбранным элементам при загрузке.";
-        TglPlaylistExportM3U.OnContent = "Экспортировать M3U плейлист";
-        TglPlaylistExportM3U.OffContent = "Экспортировать M3U плейлист";
+        _discoveryContextMap = new Dictionary<int, DiscoveryContext>();
     }
 
-    public async new Task<ContentDialogResult> ShowAsync()
+    public bool PreviousDownloadImmediatelyAsAudio
     {
-        ViewStack.SelectedIndex = (int)Pages.Discover;
-        if (string.IsNullOrEmpty(TxtUrl.Text))
+        get => _configurationService.PreviousDownloadImmediatelyAsAudio;
+        set => _configurationService.PreviousDownloadImmediatelyAsAudio = value;
+    }
+
+    public bool PreviousDownloadImmediatelyAsVideo
+    {
+        get => _configurationService.PreviousDownloadImmediatelyAsVideo;
+        set => _configurationService.PreviousDownloadImmediatelyAsVideo = value;
+    }
+
+    public async Task AddPlaylistDownloadsAsync(DiscoveryContext context, IReadOnlyList<MediaSelectionItem> items, string saveFolder, SelectionItem<MediaFileType> selectedFileType, SelectionItem<VideoResolution> selectedVideoResoltuion, SelectionItem<double> selectedAudioBitrate, bool reverseDownloadOrder, bool numberTitles, IEnumerable<SelectionItem<SubtitleLanguage>> selectedSubtitleLanguages, bool exportM3U, bool splitChapters, bool exportDescription, bool excludeFromHistory, SelectionItem<PostProcessorArgument?> selectedPostProcessorArgument)
+    {
+        var hasSuggestedSaveFolder = false;
+        var hasVideo = false;
+        foreach (var media in context.Media)
         {
-            if (Clipboard.GetContent().Contains(StandardDataFormats.Text))
+            if (!string.IsNullOrEmpty(media.SuggestedSaveFolder))
             {
-                if (Uri.TryCreate(await Clipboard.GetContent().GetTextAsync(), UriKind.Absolute, out var uri))
-                {
-                    TxtUrl.Text = uri.ToString();
-                    IsPrimaryButtonEnabled = true;
-                }
+                hasSuggestedSaveFolder = true;
+            }
+            if (media.Type == MediaType.Video)
+            {
+                hasVideo = true;
+            }
+            if (hasSuggestedSaveFolder && hasVideo)
+            {
+                break;
             }
         }
-        var result = await base.ShowAsync();
-        if (result != ContentDialogResult.Primary)
+        var m3uFile = new M3UFile(context.Title, hasSuggestedSaveFolder ? PathType.Absolute : PathType.Relative);
+        var selectedSubtitles = new List<SubtitleLanguage>();
+        foreach (var selectedSubtitleLanguage in selectedSubtitleLanguages)
         {
-            return result;
+            selectedSubtitles.Add(selectedSubtitleLanguage.Value);
         }
-        var cancellationToken = new CancellationTokenSource();
-        Title = "Ищем видео...";
-        PrimaryButtonText = null;
-        CloseButtonText = "Отмена";
-        DefaultButton = ContentDialogButton.None;
-        ViewStack.SelectedIndex = (int)Pages.Loading;
-        DispatcherQueue.TryEnqueue(async () => await DiscoverMediaAsync(cancellationToken.Token));
-        result = await base.ShowAsync();
-        if (result == ContentDialogResult.Primary)
+        var options = new List<DownloadOptions>(items.Count);
+        var titleNumber = 1;
+        for (var i = reverseDownloadOrder ? items.Count - 1 : 0; reverseDownloadOrder ? i >= 0 : i < items.Count; i += reverseDownloadOrder ? -1 : 1)
         {
-            if (_discoveryContext is not null && _discoveryContext.Items.Count > 1)
+            var item = items[i];
+            if (item.Value < 0 || item.Value >= context.Media.Count)
             {
-                await DownloadPlaylistAsync();
+                return;
+            }
+            var media = context.Media[item.Value];
+            var filteredSubtitles = new List<SubtitleLanguage>(selectedSubtitles.Count);
+            foreach (var selectedSubtitle in selectedSubtitles)
+            {
+                if (media.Subtitles.Contains(selectedSubtitle))
+                {
+                    filteredSubtitles.Add(selectedSubtitle);
+                }
+            }
+            options.Add(new DownloadOptions(media.Url)
+            {
+                Credential = context.Credential,
+                SaveFilename = $"{(numberTitles ? $"{titleNumber++} - " : string.Empty)}{(string.IsNullOrEmpty(item.Filename) ? media.Title : item.Filename.SanitizeForFilename(_configurationService.LimitCharacters))}",
+                SaveFolder = Path.Combine(!string.IsNullOrEmpty(media.SuggestedSaveFolder) ? media.SuggestedSaveFolder : saveFolder, context.Title.SanitizeForFilename(_configurationService.LimitCharacters)),
+                FileType = selectedFileType.Value.IsVideo && media.Type == MediaType.Audio ? _configurationService.PreviousAudioOnlyFileType : selectedFileType.Value,
+                PlaylistPosition = media.PlaylistPosition,
+                RequiresPlaylistItems = media.RequiresPlaylistItems,
+                VideoResolution = selectedVideoResoltuion.Value,
+                AudioBitrate = selectedAudioBitrate.Value,
+                SubtitleLanguages = filteredSubtitles,
+                SplitChapters = splitChapters,
+                ExportDescription = exportDescription,
+                PostProcessorArgument = selectedPostProcessorArgument.Value,
+                TimeFrame = TimeFrame.TryParse(item.StartTime, item.EndTime, media.TimeFrame.Duration, out var timeFrame) && timeFrame != media.TimeFrame ? timeFrame : null
+            });
+        }
+        using var transaction = await _configurationService.CreateTransactionAsync();
+        m3uFile.Add(options);
+        _configurationService.PreviousSaveFolder = saveFolder;
+        if (hasVideo)
+        {
+            _configurationService.PreviousFullFileType = selectedFileType.Value;
+            if (selectedFileType.Value.IsVideo)
+            {
+                _configurationService.PreviousVideoOnlyFileType = selectedFileType.Value;
+            }
+            else if (selectedFileType.Value.IsAudio)
+            {
+                _configurationService.PreviousAudioOnlyFileType = selectedFileType.Value;
+            }
+        }
+        else
+        {
+            _configurationService.PreviousAudioOnlyFileType = selectedFileType.Value;
+        }
+        _configurationService.PreviousVideoResolution = selectedVideoResoltuion.Value;
+        _configurationService.PreviousAudioBitrate = selectedAudioBitrate.Value;
+        _configurationService.PreviousExportM3U = exportM3U;
+        _configurationService.PreviousReverseDownloadOrder = reverseDownloadOrder;
+        _configurationService.PreviousNumberTitles = numberTitles;
+        _configurationService.PreviousSplitChapters = splitChapters;
+        _configurationService.PreviousExportDescription = exportDescription;
+        _configurationService.PreviousPostProcessorArgumentName = selectedPostProcessorArgument.Value?.Name ?? string.Empty;
+        _configurationService.PreviousSubtitleLanguages = selectedSubtitles;
+        await transaction.CommitAsync();
+        try
+        {
+            await _downloadService.AddAsync(options, excludeFromHistory);
+            if (exportM3U)
+            {
+                await m3uFile.WriteAsync(Path.Combine(saveFolder, context.Title.SanitizeForFilename(_configurationService.LimitCharacters), $"{context.Title.SanitizeForFilename(_configurationService.LimitCharacters)}.m3u"));
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"An error occurred while adding playlist downloads: {e}");
+            _notificationService.Send(new AppNotification(_translationService._("An error occurred while adding playlist downloads"), NotificationSeverity.Error)
+            {
+                Action = "error",
+                ActionParam = e.ToString()
+            });
+        }
+        _discoveryContextMap.Remove(context.Id);
+    }
+
+    public async Task AddSingleDownloadAsync(DiscoveryContext context, string saveFilename, string saveFolder, SelectionItem<MediaFileType> selectedFileType, SelectionItem<Format> selectedVideoFormat, SelectionItem<Format> selectedAudioFormat, IEnumerable<SelectionItem<SubtitleLanguage>> selectedSubtitleLanguages, bool splitChapters, bool exportDescription, bool excludeFromHistory, SelectionItem<PostProcessorArgument?> selectedPostProcessorArgument, string startTime, string endTime)
+    {
+        var media = context.Media[0];
+        var subtitleLanguages = new List<SubtitleLanguage>();
+        foreach (var selectedSubtitleLanguage in selectedSubtitleLanguages)
+        {
+            subtitleLanguages.Add(selectedSubtitleLanguage.Value);
+        }
+        var options = new DownloadOptions(media.Url)
+        {
+            Credential = context.Credential,
+            SaveFilename = string.IsNullOrEmpty(saveFilename) ? media.Title : saveFilename.SanitizeForFilename(_configurationService.LimitCharacters),
+            SaveFolder = saveFolder,
+            FileType = selectedFileType.Value,
+            PlaylistPosition = media.PlaylistPosition,
+            RequiresPlaylistItems = media.RequiresPlaylistItems,
+            VideoFormat = selectedVideoFormat.Value,
+            AudioFormat = selectedAudioFormat.Value,
+            SubtitleLanguages = subtitleLanguages,
+            SplitChapters = splitChapters,
+            ExportDescription = exportDescription,
+            PostProcessorArgument = selectedPostProcessorArgument.Value,
+            TimeFrame = TimeFrame.TryParse(startTime, endTime, media.TimeFrame.Duration, out var timeFrame) && timeFrame != media.TimeFrame ? timeFrame : null
+        };
+        using var transaction = await _configurationService.CreateTransactionAsync();
+        _configurationService.PreviousSaveFolder = options.SaveFolder;
+        if (media.Type == MediaType.Video)
+        {
+            _configurationService.PreviousFullFileType = options.FileType;
+            if (selectedFileType.Value.IsVideo)
+            {
+                _configurationService.PreviousVideoOnlyFileType = selectedFileType.Value;
+            }
+            else if (selectedFileType.Value.IsAudio)
+            {
+                _configurationService.PreviousAudioOnlyFileType = selectedFileType.Value;
+            }
+        }
+        else
+        {
+            _configurationService.PreviousAudioOnlyFileType = options.FileType;
+        }
+        if (media.Formats.HasFormats(MediaType.Video))
+        {
+            var previous = _configurationService.PreviousVideoFormatIds;
+            previous[options.FileType] = options.VideoFormat?.Id ?? _configurationService.PreviousVideoFormatIds[options.FileType];
+            _configurationService.PreviousVideoFormatIds = previous;
+        }
+        if (media.Formats.HasFormats(MediaType.Audio))
+        {
+            var previous = _configurationService.PreviousAudioFormatIds;
+            previous[options.FileType] = options.AudioFormat?.Id ?? _configurationService.PreviousAudioFormatIds[options.FileType];
+            _configurationService.PreviousAudioFormatIds = previous;
+        }
+        _configurationService.PreviousSplitChapters = options.SplitChapters;
+        _configurationService.PreviousExportDescription = options.ExportDescription;
+        _configurationService.PreviousPostProcessorArgumentName = options.PostProcessorArgument?.Name ?? string.Empty;
+        _configurationService.PreviousSubtitleLanguages = options.SubtitleLanguages;
+        await transaction.CommitAsync();
+        try
+        {
+            await _downloadService.AddAsync(options, excludeFromHistory);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"An error occurred while adding the single download: {e}");
+            _notificationService.Send(new AppNotification(_translationService._("An error occurred while adding the single download"), NotificationSeverity.Error)
+            {
+                Action = "error",
+                ActionParam = e.ToString()
+            });
+        }
+        _discoveryContextMap.Remove(context.Id);
+    }
+
+    public async Task<DiscoveryContext?> DiscoverAsync(Uri url, Credential? credential, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var res = url.IsFile ? await _discoveryService.GetForBatchFileAsync(url.LocalPath, credential, cancellationToken) : await _discoveryService.GetForUrlAsync(url, credential, cancellationToken);
+            if (res.Media.Count == 0)
+            {
+                _logger.LogError($"No media was found: {url}");
+                _notificationService.Send(new AppNotification(_translationService._("No media was found at the provided URL"), NotificationSeverity.Warning)
+                {
+                    Action = "error"
+                });
+                return null;
+            }
+            var context = new DiscoveryContext(res.Id, res.Url, res.Title, credential, res.Media);
+            if (!res.IsPlaylist)
+            {
+                foreach (var format in res.Media[0].Formats)
+                {
+                    var formatSelectionItem = new SelectionItem<Format>(format, format.ToString(_translationService), false);
+                    if (format.Type == MediaType.Audio)
+                    {
+                        context.AudioFormats.Add(formatSelectionItem);
+                    }
+                    else if (format.Type == MediaType.Video)
+                    {
+                        context.VideoFormats.Add(formatSelectionItem);
+                    }
+                }
             }
             else
             {
-                await DownloadSingleAsync();
+                var matched = false;
+                var bitrates = new HashSet<double>();
+                var resolutions = new HashSet<VideoResolution>();
+                foreach (var media in res.Media)
+                {
+                    foreach (var format in media.Formats)
+                    {
+                        if (format.Bitrate.HasValue)
+                        {
+                            bitrates.Add(format.Bitrate.Value);
+                        }
+                        if (format.VideoResolution is not null)
+                        {
+                            resolutions.Add(format.VideoResolution);
+                        }
+                    }
+                }
+                foreach (var bitrate in bitrates)
+                {
+                    var shouldSelect = _configurationService.PreviousAudioBitrate == bitrate;
+                    context.AudioBitrates.Add(new SelectionItem<double>(bitrate, $"{bitrate}k", shouldSelect));
+                    matched |= shouldSelect;
+                }
+                context.AudioBitrates.Sort((a, b) => a.Value.CompareTo(b.Value));
+                context.AudioBitrates.Insert(0, new SelectionItem<double>(-1.0, _translationService._("Worst"), _configurationService.PreviousAudioBitrate == -1.0));
+                context.AudioBitrates.Insert(0, new SelectionItem<double>(double.MaxValue, _translationService._("Best"), !matched || _configurationService.PreviousAudioBitrate == double.MaxValue));
+                matched = false;
+                foreach (var resolution in resolutions)
+                {
+                    var shouldSelect = _configurationService.PreviousVideoResolution == resolution;
+                    context.VideoResolutions.Add(new SelectionItem<VideoResolution>(resolution, resolution.ToString(_translationService), shouldSelect));
+                    matched |= shouldSelect;
+                }
+                context.VideoResolutions.Sort((a, b) => a.Value.CompareTo(b.Value));
+                context.VideoResolutions.Insert(0, new SelectionItem<VideoResolution>(VideoResolution.Worst, VideoResolution.Worst.ToString(_translationService), _configurationService.PreviousVideoResolution == VideoResolution.Worst));
+                context.VideoResolutions.Insert(0, new SelectionItem<VideoResolution>(VideoResolution.Best, VideoResolution.Best.ToString(_translationService), !matched || _configurationService.PreviousVideoResolution == VideoResolution.Best));
             }
+            var hasVideo = false;
+            foreach (var media in res.Media)
+            {
+                if (media.Type == MediaType.Video)
+                {
+                    hasVideo = true;
+                    break;
+                }
+            }
+            var previousFileType = (!hasVideo || _configurationService.PreviousDownloadImmediatelyAsAudio) ? _configurationService.PreviousAudioOnlyFileType : (_configurationService.PreviousDownloadImmediatelyAsVideo ? _configurationService.PreviousVideoOnlyFileType : _configurationService.PreviousFullFileType);
+            context.FileTypes.EnsureCapacity(hasVideo ? 13 : 7);
+            if (hasVideo)
+            {
+                context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.Video, _translationService._("Video (Generic)"), previousFileType == MediaFileType.Video));
+                context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.MP4, _translationService._("MP4 (Video)"), previousFileType == MediaFileType.MP4));
+                context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.WEBM, _translationService._("WEBM (Video)"), previousFileType == MediaFileType.WEBM));
+                context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.MKV, _translationService._("MKV (Video)"), previousFileType == MediaFileType.MKV));
+                context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.MOV, _translationService._("MOV (Video)"), previousFileType == MediaFileType.MOV));
+                context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.AVI, _translationService._("AVI (Video)"), previousFileType == MediaFileType.AVI));
+            }
+            context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.Audio, _translationService._("Audio (Generic)"), previousFileType == MediaFileType.Audio));
+            context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.MP3, _translationService._("MP3 (Audio)"), previousFileType == MediaFileType.MP3));
+            context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.M4A, _translationService._("M4A (Audio)"), previousFileType == MediaFileType.M4A));
+            context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.OPUS, _translationService._("OPUS (Audio)"), previousFileType == MediaFileType.OPUS));
+            context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.FLAC, _translationService._("FLAC (Audio)"), previousFileType == MediaFileType.FLAC));
+            context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.WAV, _translationService._("WAV (Audio)"), previousFileType == MediaFileType.WAV));
+            context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.OGG, _translationService._("OGG (Audio)"), previousFileType == MediaFileType.OGG));
+            var subtitles = new HashSet<SubtitleLanguage>();
+            foreach (var media in res.Media)
+            {
+                foreach (var subtitle in media.Subtitles)
+                {
+                    subtitles.Add(subtitle);
+                }
+            }
+            foreach (var subtitle in subtitles)
+            {
+                context.SubtitleLanguages.Add(new SelectionItem<SubtitleLanguage>(subtitle, subtitle.ToString(_translationService), _configurationService.PreviousSubtitleLanguages.Contains(subtitle)));
+            }
+            context.SubtitleLanguages.Sort((a, b) => a.Value.CompareTo(b.Value));
+            context.Items.EnsureCapacity(res.Media.Count);
+            for (var i = 0; i < res.Media.Count; i++)
+            {
+                var media = res.Media[i];
+                context.Items.Add(new MediaSelectionItem(i, media, _translationService));
+            }
+            _discoveryContextMap[res.Id] = context;
+            return context;
         }
-        else
+        catch (TaskCanceledException)
         {
-            cancellationToken.Cancel();
+            return null;
         }
-        cancellationToken.Dispose();
-        return result;
-    }
-
-    public async Task<ContentDialogResult> ShowAsync(Uri url)
-    {
-        TxtUrl.Text = url.ToString();
-        IsPrimaryButtonEnabled = true;
-        return await ShowAsync();
-    }
-
-    private async Task DiscoverMediaAsync(CancellationToken cancellationToken)
-    {
-        _discoveryContext = await _controller.DiscoverAsync(new Uri(TxtUrl.Text), null, cancellationToken);
-        if (_discoveryContext is null)
+        catch (Exception e)
         {
-            Hide();
-            return;
-        }
-        using var thumbnailMemoryStream = await _controller.GetThumbnailImageStreamAsync(_discoveryContext);
-        using var thumbnailStream = thumbnailMemoryStream.AsRandomAccessStream();
-        var thumbnailDecoder = await BitmapDecoder.CreateAsync(thumbnailStream);
-        var thumbnailBitmap = await thumbnailDecoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
-        var thumbnailSource = new SoftwareBitmapSource();
-        await thumbnailSource.SetBitmapAsync(thumbnailBitmap);
-        Title = "Настройка загрузки";
-        PrimaryButtonText = "Скачать";
-        CloseButtonText = "Отмена";
-        SecondaryButtonText = null;
-        DefaultButton = ContentDialogButton.Primary;
-        if (_discoveryContext.Items.Count == 1)
-        {
-            ViewStack.SelectedIndex = (int)Pages.Single;
-            ViewStackSingle.SelectedIndex = (int)SinglePages.General;
-            ImgSingleThumbnail.Source = thumbnailSource;
-            LblSingleTitle.Text = _discoveryContext.Title;
-            LblSingleUrl.Text = _discoveryContext.Url.ToString();
-            TxtSingleSaveFilename.Text = _discoveryContext.Items[0].Label;
-            TxtSingleSaveFolder.Text = _controller.PreviousSaveFolder;
-            CmbSingleVideoFormat.ItemsSource = _discoveryContext.VideoFormats.ToBindableSelectonItems();
-            CmbSingleAudioFormat.ItemsSource = _discoveryContext.AudioFormats.ToBindableSelectonItems();
-            CmbSingleFileType.ItemsSource = _discoveryContext.FileTypes.ToBindableSelectonItems();
-            CmbSingleFileType.SelectSelectionItem();
-            TxtSingleStartTime.PlaceholderText = _discoveryContext.Items[0].StartTime;
-            TxtSingleStartTime.Text = _discoveryContext.Items[0].StartTime;
-            TxtSingleEndTime.PlaceholderText = _discoveryContext.Items[0].EndTime;
-            TxtSingleEndTime.Text = _discoveryContext.Items[0].EndTime;
-        }
-        else
-        {
-            ViewStack.SelectedIndex = (int)Pages.Playlist;
-            ViewStackPlaylist.SelectedIndex = (int)PlaylistPages.General;
-            ImgPlaylistThumbnail.Source = thumbnailSource;
-            LblPlaylistTitle.Text = _discoveryContext.Title;
-            LblPlaylistUrl.Text = _discoveryContext.Url.ToString();
-            TxtPlaylistSaveFolder.Text = _controller.PreviousSaveFolder;
-            CmbPlaylistFileType.ItemsSource = _discoveryContext.FileTypes.ToBindableSelectonItems();
-            CmbPlaylistFileType.SelectSelectionItem();
-            CmbPlaylistSuggestedVideoResolution.ItemsSource = _discoveryContext.VideoResolutions.ToBindableSelectonItems();
-            CmbPlaylistSuggestedVideoResolution.SelectSelectionItem();
-            CmbPlaylistSuggestedAudioBitrate.ItemsSource = _discoveryContext.AudioBitrates.ToBindableSelectonItems();
-            CmbPlaylistSuggestedAudioBitrate.SelectSelectionItem();
-            LblPlaylistItemsTime.Text = $"Общая длительность: {_discoveryContext.TotalDuration}";
-            TglPlaylistReverseDownloadOrder.IsOn = _controller.PreviousReverseDownloadOrder;
-            TglPlaylistNumberTitles.IsOn = _controller.PreviousNumberTitles;
-            ListPlaylistItems.ItemsSource = _discoveryContext.Items.ToBindableMediaSelectionItems();
-            ListPlaylistItems.SelectMediaSelectionItems();
-            TglPlaylistExportM3U.IsOn = _controller.PreviousExportM3U;
+            if (e is not YtdlpException)
+            {
+                _logger.LogError($"An error occurred while discovering media ({url}): {e}");
+            }
+            _notificationService.Send(new AppNotification(_translationService._("An error occurred while discovering media"), NotificationSeverity.Error)
+            {
+                Action = "error",
+                ActionParam = e.ToString()
+            });
+            return null;
         }
     }
 
-    private Task DownloadSingleAsync() => _controller.AddSingleDownloadAsync(_discoveryContext!,
-        TxtSingleSaveFilename.Text,
-        TxtSingleSaveFolder.Text,
-        (CmbSingleFileType.SelectedItem as BindableSelectionItem)!.ToSelectionItem<MediaFileType>()!,
-        (CmbSingleVideoFormat.SelectedItem as BindableSelectionItem)!.ToSelectionItem<Format>()!,
-        (CmbSingleAudioFormat.SelectedItem as BindableSelectionItem)!.ToSelectionItem<Format>()!,
-        Enumerable.Empty<SelectionItem<SubtitleLanguage>>(),
-        false,
-        false,
-        false,
-        new SelectionItem<PostProcessorArgument?>(null, "", true),
-        TxtSingleStartTime.Text,
-        TxtSingleEndTime.Text
-    );
-
-    private async Task DownloadPlaylistAsync()
+    public async Task<IReadOnlyList<SelectionItem<Credential?>>> GetAvailableCredentialsAsync()
     {
-        var selectedPlaylistItems = new List<MediaSelectionItem>();
-        foreach (var item in ListPlaylistItems.SelectedItems)
+        var credentials = await _keyringService.GetAllCredentialAsync();
+        var res = new List<SelectionItem<Credential?>>(credentials.Count + 1)
         {
-            selectedPlaylistItems.Add((item as BindableMediaSelectionItem)!.SelectionItem);
-        }
-        await _controller.AddPlaylistDownloadsAsync(_discoveryContext!,
-            selectedPlaylistItems,
-            TxtPlaylistSaveFolder.Text,
-            (CmbPlaylistFileType.SelectedItem as BindableSelectionItem)!.ToSelectionItem<MediaFileType>()!,
-            (CmbPlaylistSuggestedVideoResolution.SelectedItem as BindableSelectionItem)!.ToSelectionItem<VideoResolution>()!,
-            (CmbPlaylistSuggestedAudioBitrate.SelectedItem as BindableSelectionItem)!.ToSelectionItem<double>()!,
-            TglPlaylistReverseDownloadOrder.IsOn,
-            TglPlaylistNumberTitles.IsOn,
-            Enumerable.Empty<SelectionItem<SubtitleLanguage>>(),
-            TglPlaylistExportM3U.IsOn,
-            false,
-            false,
-            false,
-            new SelectionItem<PostProcessorArgument?>(null, "", true));
-    }
-
-    private void TxtUrl_TextChanged(object? sender, TextChangedEventArgs e) => IsPrimaryButtonEnabled = !TxtUrl.Text.StartsWith("//") && Uri.TryCreate(TxtUrl.Text, UriKind.Absolute, out var _);
-
-    private void NavViewSingle_SelectionChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
-    {
-        ViewStackSingle.SelectedIndex = (NavViewSingle.SelectedItem.Tag as string)! switch
-        {
-            "Advanced" => (int)SinglePages.Advanced,
-            _ => (int)SinglePages.General
+            new SelectionItem<Credential?>(null, _translationService._("Use manual credential"), true)
         };
-    }
-
-    private void BtnSingleRevertFilename_Click(object? sender, RoutedEventArgs e) => TxtSingleSaveFilename.Text = _discoveryContext!.Items[0].Label;
-
-    private async void BtnSingleSelectSaveFolder_Click(object? sender, RoutedEventArgs e)
-    {
-        BtnSingleSelectSaveFolder.IsEnabled = false;
-        try
+        foreach (var credential in credentials)
         {
-            var picker = new FolderPicker(WindowId!.Value)
-            {
-                SuggestedStartLocation = PickerLocationId.Downloads
-            };
-            await Task.Yield();
-            var folder = await picker.PickSingleFolderAsync();
-            if (folder is not null)
-            {
-                TxtSingleSaveFolder.Text = folder.Path;
-            }
+            res.Add(new SelectionItem<Credential?>(credential, credential.Name, false));
         }
-        finally
-        {
-            BtnSingleSelectSaveFolder.IsEnabled = true;
-        }
+        return res;
     }
 
-    private void CmbSingleFileType_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    public IReadOnlyList<SelectionItem<PostProcessorArgument?>> GetAvailablePostProcessorArguments()
     {
-        var selectedFileType = (CmbSingleFileType.SelectedItem as BindableSelectionItem)!.ToSelectionItem<MediaFileType>()!;
-        TeachSingleFileType.IsOpen = _controller.GetShouldShowFileTypeTeach(_discoveryContext!, selectedFileType);
-        CmbSingleVideoFormat.SelectSelectionItemByFormatId(_controller.PreviousVideoFormatIds[selectedFileType.Value]);
-        CmbSingleAudioFormat.SelectSelectionItemByFormatId(_controller.PreviousAudioFormatIds[selectedFileType.Value]);
-    }
-
-    private void NavViewPlaylist_SelectionChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
-    {
-        ViewStackPlaylist.SelectedIndex = (NavViewPlaylist.SelectedItem.Tag as string)! switch
+        var res = new List<SelectionItem<PostProcessorArgument?>>(_configurationService.PostprocessingArguments.Count + 1);
+        var hasSelected = false;
+        foreach (var argument in _configurationService.PostprocessingArguments)
         {
-            "Items" => (int)PlaylistPages.Items,
-            "Advanced" => (int)PlaylistPages.Advanced,
-            _ => (int)PlaylistPages.General
-        };
-    }
-
-    private async void BtnPlaylistSelectSaveFolder_Click(object? sender, RoutedEventArgs e)
-    {
-        BtnPlaylistSelectSaveFolder.IsEnabled = false;
-        try
-        {
-            var picker = new FolderPicker(WindowId!.Value)
-            {
-                SuggestedStartLocation = PickerLocationId.Downloads
-            };
-            await Task.Yield();
-            var folder = await picker.PickSingleFolderAsync();
-            if (folder is not null)
-            {
-                TxtPlaylistSaveFolder.Text = folder.Path;
-            }
+            var shouldSelect = _configurationService.PreviousPostProcessorArgumentName == argument.Name;
+            hasSelected |= shouldSelect;
+            res.Add(new SelectionItem<PostProcessorArgument?>(argument, argument.Name, shouldSelect));
         }
-        finally
-        {
-            BtnPlaylistSelectSaveFolder.IsEnabled = true;
-        }
+        res.Insert(0, new SelectionItem<PostProcessorArgument?>(null, _translationService._("None"), !hasSelected));
+        return res;
     }
 
-    private void CmbPlaylistFileType_SelectionChanged(object? sender, SelectionChangedEventArgs e) => TeachPlaylistFileType.IsOpen = _controller.GetShouldShowFileTypeTeach(_discoveryContext!, (CmbPlaylistFileType.SelectedItem as BindableSelectionItem)!.ToSelectionItem<MediaFileType>()!);
-
-    private void BtnPlaylistSelectAllItems_Click(object? sender, RoutedEventArgs e) => ListPlaylistItems.SelectAll();
-
-    private void BtnPlaylistDeselectAllItems_Click(object? sender, RoutedEventArgs e) => ListPlaylistItems.DeselectAll();
-
-    private void TglPlaylistNumberTitles_Toggled(object? sender, RoutedEventArgs e) => TeachPlaylistNumberTitles.IsOpen = _controller.GetShouldShowNumberTitlesTeach();
-
-    private void BtnPlaylistRevertFilename_Click(object? sender, RoutedEventArgs e)
+    public bool GetShouldShowDownloadImmediatelyTeach()
     {
-        var index = (int)(sender as Button)!.Tag;
-        if (ListPlaylistItems.ItemsSource is IReadOnlyList<BindableMediaSelectionItem> items)
+        if (!_configurationService.PreviousDownloadImmediatelyAsVideo && !_configurationService.PreviousDownloadImmediatelyAsAudio && !_shownTeachTypeFlag.HasFlag(AddDownloadTeachType.DownloadImmediately))
         {
-            items[index].Filename = items[index].Label;
+            _shownTeachTypeFlag |= AddDownloadTeachType.DownloadImmediately;
+            return true;
         }
+        return false;
     }
 
-    private void ListPlaylistItems_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    public bool GetShouldShowFileTypeTeach(DiscoveryContext context, SelectionItem<MediaFileType> selectedFileType)
     {
-        var totalDuration = TimeSpan.Zero;
-        foreach (var selectedItem in ListPlaylistItems.SelectedItems)
+        var previousFileType = context.Media.Any(m => m.Type == MediaType.Video) ? _configurationService.PreviousFullFileType : _configurationService.PreviousAudioOnlyFileType;
+        if (!previousFileType.IsGeneric && selectedFileType.Value.IsGeneric && !_shownTeachTypeFlag.HasFlag(AddDownloadTeachType.FileType))
         {
-            totalDuration += ((BindableMediaSelectionItem)selectedItem).Duration;
+            _shownTeachTypeFlag |= AddDownloadTeachType.FileType;
+            return true;
         }
-        LblPlaylistItemsTime.Text = $"Общая длительность: {totalDuration}";
+        return false;
     }
+
+    public bool GetShouldShowNumberTitlesTeach()
+    {
+        if (!_configurationService.PreviousNumberTitles && !_shownTeachTypeFlag.HasFlag(AddDownloadTeachType.NumberTitles))
+        {
+            _shownTeachTypeFlag |= AddDownloadTeachType.NumberTitles;
+            return true;
+        }
+        return false;
+    }
+
+    public Task<byte[]> GetThumbnailImageBytesAsync(DiscoveryContext context) => _thumbnailService.GetImageBytesAsync(context.Media[0].Url);
+
+    public Task<MemoryStream> GetThumbnailImageStreamAsync(DiscoveryContext context) => _thumbnailService.GetImageStreamAsync(context.Media[0].Url);
 }
