@@ -45,7 +45,6 @@ public sealed partial class MainWindow : Window
         _translationService = translationService;
         _downloadRows = new Dictionary<int, DownloadRow>();
         _notificationClickHandler = null;
-        // Config
         AppWindow.TitleBar.PreferredTheme = _controller.Theme switch
         {
             Theme.Light => TitleBarTheme.Light,
@@ -59,13 +58,11 @@ public sealed partial class MainWindow : Window
             _ => ElementTheme.Default
         };
         this.Geometry = _controller.WindowGeometry;
-        // TitleBar
         AppWindow.SetIcon("./Assets/papa_cat.ico");
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(TitleBar);
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
         BtnPreview.Visibility = Visibility.Collapsed;
-        // Events
         AppWindow.Closing += Window_Closing;
         eventsService.AppNotificationSent += (sender, e) => DispatcherQueue.TryEnqueue(() => App_AppNotificationSent(sender, e));
         eventsService.ConfigurationSaved += App_ConfigurationSaved;
@@ -76,14 +73,11 @@ public sealed partial class MainWindow : Window
         eventsService.DownloadStartedFromQueue += (sender, e) => DispatcherQueue.TryEnqueue(() => Controller_DownloadStartedFromQueue(sender, e));
         eventsService.DownloadRetired += (sender, e) => DispatcherQueue.TryEnqueue(() => Controller_DownloadRetired(sender, e));
         eventsService.DownloadRequested += async (s, args) => await AddDownloadAsync(args.Url);
-        // Translations
         AppWindow.Title = "Папа Качай ❤️";
         LblTitle.Text = "Папа Качай ❤️";
         MenuFile.Title = "Файл";
         MenuAddDownload.Text = "Добавить загрузку";
         MenuExit.Text = "Выход";
-        MenuEdit.Title = "Правка";
-        MenuSettings.Text = "Настройки";
         MenuView.Title = "Вид";
         MenuHistory.Text = "История";
         MenuDownloads.Title = "Загрузки";
@@ -94,7 +88,6 @@ public sealed partial class MainWindow : Window
         LblHomeTitle.Text = "Привет, папа! 👋 Ну что, давай качать интересные видосы? 🎬\n\nТвои Лена, Саша и Фреди";
         LblHomeDescription.Text = "Вставь ссылку на видео или музыку с YouTube — и скачивай!";
         LblAddDownload.Text = "Добавить ссылку";
-        LblSettings.Text = "Настройки";
         BtnStopAllRemaining.Label = "Остановить все";
         BtnRetryAllFailed.Label = "Повторить неудачные";
         BtnClearAllQueued.Label = "Очистить очередь";
@@ -121,10 +114,7 @@ public sealed partial class MainWindow : Window
         ViewStackDownloads.SelectedIndex = 0;
         if (_controller.ShowDisclaimerOnStartup)
         {
-            var checkBox = new CheckBox()
-            {
-                Content = "Больше не показывать"
-            };
+            var checkBox = new CheckBox() { Content = "Больше не показывать" };
             var disclaimerDialog = new ContentDialog()
             {
                 Title = "Важное замечание",
@@ -367,9 +357,7 @@ public sealed partial class MainWindow : Window
     }
 
     private async void DownloadRow_RetryRequested(object? sender, int id) => await _controller.RetryDownloadAsync(id);
-
     private async void DownloadRow_StopRequested(object? sender, int id) => await _controller.StopDownloadAsync(id);
-
     private void NavViewDownloads_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args) => UpdateDownloadsList();
 
     private void UpdateProgress_Changed(object? sender, DownloadProgress e)
@@ -391,7 +379,6 @@ public sealed partial class MainWindow : Window
     }
 
     private async void AddDownload(object? sender, RoutedEventArgs e) => await AddDownloadAsync(null);
-
     private void Exit(object sender, RoutedEventArgs args) => Window_Closing(AppWindow, null!);
 
     private async void Keyring(object sender, RoutedEventArgs args)
@@ -447,7 +434,6 @@ public sealed partial class MainWindow : Window
     }
 
     private async void RetryAllFailed(object? sender, RoutedEventArgs e) => await _controller.RetryFailedDownloadsAsync();
-
     private async void StopAllRemaining(object? sender, RoutedEventArgs e) => await _controller.StopAllDownloadsAsync();
 
     private async void WindowsUpdate(object? sender, RoutedEventArgs e)
