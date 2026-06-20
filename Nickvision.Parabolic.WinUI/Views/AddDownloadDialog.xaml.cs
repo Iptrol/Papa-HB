@@ -34,7 +34,6 @@ public sealed partial class AddDownloadDialog : ContentDialog
     private enum SinglePages
     {
         General = 0,
-        Subtitles,
         Advanced
     }
 
@@ -42,14 +41,12 @@ public sealed partial class AddDownloadDialog : ContentDialog
     {
         General = 0,
         Items,
-        Subtitles,
         Advanced
     }
 
     private readonly AddDownloadDialogController _controller;
     private readonly ITranslationService _translationService;
     private DiscoveryContext? _discoveryContext;
-    private bool _isUpdatingSubtitleSelection;
 
     public WindowId? WindowId { get; set; }
 
@@ -59,7 +56,6 @@ public sealed partial class AddDownloadDialog : ContentDialog
         _controller = controller;
         _translationService = translationService;
         _discoveryContext = null;
-        _isUpdatingSubtitleSelection = false;
         Title = "Добавить загрузку";
         PrimaryButtonText = "Найти";
         CloseButtonText = "Отмена";
@@ -69,7 +65,6 @@ public sealed partial class AddDownloadDialog : ContentDialog
         TxtUrl.PlaceholderText = "Вставь ссылку сюда";
         LblLoading.Text = "Загружаем информацию, подожди...";
         NavViewItemSingleGeneral.Text = "Общее";
-        NavViewItemSingleSubtitles.Text = "Субтитры";
         NavViewItemSingleAdvanced.Text = "Дополнительно";
         TxtSingleSaveFilename.Header = "Название файла";
         ToolTipService.SetToolTip(BtnSingleRevertFilename, "Вернуть оригинальное название");
@@ -80,23 +75,10 @@ public sealed partial class AddDownloadDialog : ContentDialog
         TeachSingleFileType.Subtitle = "Некоторые форматы не поддерживают встроенные субтитры и обложки.";
         CmbSingleVideoFormat.Header = "Качество видео";
         CmbSingleAudioFormat.Header = "Качество аудио";
-        StatusSingleSubtitles.Title = "Субтитры не найдены";
-        StatusSingleSubtitles.Description = "Для этого видео субтитры недоступны.";
-        LblSingleSelectAllSubtitles.Text = "Выбрать все";
-        LblSingleDeselectAllSubtitles.Text = "Снять выбор";
-        TxtSingleSubtitlesSearch.PlaceholderText = "Поиск субтитров";
-        TglSingleSplitChapters.OnContent = "Разбить по главам";
-        TglSingleSplitChapters.OffContent = "Разбить по главам";
-        TglSingleExportDescription.OnContent = "Сохранить описание";
-        TglSingleExportDescription.OffContent = "Сохранить описание";
-        TglSingleExcludeFromHistory.OnContent = "Не сохранять в историю";
-        TglSingleExcludeFromHistory.OffContent = "Не сохранять в историю";
-        CmbSinglePostProcessorArgument.Header = "Пост-обработка";
         TxtSingleStartTime.Header = "Время начала";
         TxtSingleEndTime.Header = "Время конца";
         NavViewItemPlaylistGeneral.Text = "Общее";
         NavViewItemPlaylistItems.Text = "Видео";
-        NavViewItemPlaylistSubtitles.Text = "Субтитры";
         NavViewItemPlaylistAdvanced.Text = "Дополнительно";
         TxtPlaylistSaveFolder.Header = "Папка для сохранения";
         ToolTipService.SetToolTip(BtnPlaylistSelectSaveFolder, "Выбрать папку");
@@ -113,21 +95,8 @@ public sealed partial class AddDownloadDialog : ContentDialog
         TglPlaylistNumberTitles.OffContent = "Нумеровать названия";
         TeachPlaylistNumberTitles.Title = "Внимание";
         TeachPlaylistNumberTitles.Subtitle = "Нумерация будет применена к выбранным элементам при загрузке.";
-        StatusPlaylistSubtitles.Title = "Субтитры не найдены";
-        StatusPlaylistSubtitles.Description = "В этом плейлисте субтитры недоступны.";
-        LblPlaylistSelectAllSubtitles.Text = "Выбрать все";
-        LblPlaylistDeselectAllSubtitles.Text = "Снять выбор";
-        LblPlaylistSubtitleNote.Text = "Некоторые видео в плейлисте могут не иметь субтитров.";
-        TxtPlaylistSubtitlesSearch.PlaceholderText = "Поиск субтитров";
         TglPlaylistExportM3U.OnContent = "Экспортировать M3U плейлист";
         TglPlaylistExportM3U.OffContent = "Экспортировать M3U плейлист";
-        TglPlaylistSplitChapters.OnContent = "Разбить по главам";
-        TglPlaylistSplitChapters.OffContent = "Разбить по главам";
-        TglPlaylistExportDescription.OnContent = "Сохранить описание";
-        TglPlaylistExportDescription.OffContent = "Сохранить описание";
-        TglPlaylistExcludeFromHistory.OnContent = "Не сохранять в историю";
-        TglPlaylistExcludeFromHistory.OffContent = "Не сохранять в историю";
-        CmbPlaylistPostProcessorArgument.Header = "Пост-обработка";
     }
 
     public async new Task<ContentDialogResult> ShowAsync()
@@ -206,7 +175,6 @@ public sealed partial class AddDownloadDialog : ContentDialog
         {
             ViewStack.SelectedIndex = (int)Pages.Single;
             ViewStackSingle.SelectedIndex = (int)SinglePages.General;
-            ViewStackSingleSubtitles.SelectedIndex = _discoveryContext.SubtitleLanguages.Any() ? 1 : 0;
             ImgSingleThumbnail.Source = thumbnailSource;
             LblSingleTitle.Text = _discoveryContext.Title;
             LblSingleUrl.Text = _discoveryContext.Url.ToString();
@@ -216,13 +184,6 @@ public sealed partial class AddDownloadDialog : ContentDialog
             CmbSingleAudioFormat.ItemsSource = _discoveryContext.AudioFormats.ToBindableSelectonItems();
             CmbSingleFileType.ItemsSource = _discoveryContext.FileTypes.ToBindableSelectonItems();
             CmbSingleFileType.SelectSelectionItem();
-            ListSingleSubtitles.ItemsSource = _discoveryContext.SubtitleLanguages.ToBindableSelectonItems();
-            ListSingleSubtitles.SelectSelectionItems();
-            TxtSingleSubtitlesSearch.Text = string.Empty;
-            TglSingleSplitChapters.IsOn = _controller.PreviousSplitChapters;
-            TglSingleExportDescription.IsOn = _controller.PreviousExportDescription;
-            CmbSinglePostProcessorArgument.ItemsSource = _controller.GetAvailablePostProcessorArguments().ToBindableSelectonItems();
-            CmbSinglePostProcessorArgument.SelectSelectionItem();
             TxtSingleStartTime.PlaceholderText = _discoveryContext.Items[0].StartTime;
             TxtSingleStartTime.Text = _discoveryContext.Items[0].StartTime;
             TxtSingleEndTime.PlaceholderText = _discoveryContext.Items[0].EndTime;
@@ -232,7 +193,6 @@ public sealed partial class AddDownloadDialog : ContentDialog
         {
             ViewStack.SelectedIndex = (int)Pages.Playlist;
             ViewStackPlaylist.SelectedIndex = (int)PlaylistPages.General;
-            ViewStackPlaylistSubtitles.SelectedIndex = _discoveryContext.SubtitleLanguages.Any() ? 1 : 0;
             ImgPlaylistThumbnail.Source = thumbnailSource;
             LblPlaylistTitle.Text = _discoveryContext.Title;
             LblPlaylistUrl.Text = _discoveryContext.Url.ToString();
@@ -248,14 +208,7 @@ public sealed partial class AddDownloadDialog : ContentDialog
             TglPlaylistNumberTitles.IsOn = _controller.PreviousNumberTitles;
             ListPlaylistItems.ItemsSource = _discoveryContext.Items.ToBindableMediaSelectionItems();
             ListPlaylistItems.SelectMediaSelectionItems();
-            ListPlaylistSubtitles.ItemsSource = _discoveryContext.SubtitleLanguages.ToBindableSelectonItems();
-            ListPlaylistSubtitles.SelectSelectionItems();
-            TxtPlaylistSubtitlesSearch.Text = string.Empty;
             TglPlaylistExportM3U.IsOn = _controller.PreviousExportM3U;
-            TglPlaylistSplitChapters.IsOn = _controller.PreviousSplitChapters;
-            TglPlaylistExportDescription.IsOn = _controller.PreviousExportDescription;
-            CmbPlaylistPostProcessorArgument.ItemsSource = _controller.GetAvailablePostProcessorArguments().ToBindableSelectonItems();
-            CmbPlaylistPostProcessorArgument.SelectSelectionItem();
         }
     }
 
@@ -265,11 +218,11 @@ public sealed partial class AddDownloadDialog : ContentDialog
         (CmbSingleFileType.SelectedItem as BindableSelectionItem)!.ToSelectionItem<MediaFileType>()!,
         (CmbSingleVideoFormat.SelectedItem as BindableSelectionItem)!.ToSelectionItem<Format>()!,
         (CmbSingleAudioFormat.SelectedItem as BindableSelectionItem)!.ToSelectionItem<Format>()!,
-        _discoveryContext!.SubtitleLanguages.Where(x => x.ShouldSelect),
-        TglSingleSplitChapters.IsOn,
-        TglSingleExportDescription.IsOn,
-        TglSingleExcludeFromHistory.IsOn,
-        (CmbSinglePostProcessorArgument.SelectedItem as BindableSelectionItem)!.ToSelectionItem<PostProcessorArgument?>()!,
+        Enumerable.Empty<SubtitleLanguage>(),
+        false,
+        false,
+        false,
+        null,
         TxtSingleStartTime.Text,
         TxtSingleEndTime.Text
     );
@@ -289,12 +242,12 @@ public sealed partial class AddDownloadDialog : ContentDialog
             (CmbPlaylistSuggestedAudioBitrate.SelectedItem as BindableSelectionItem)!.ToSelectionItem<double>()!,
             TglPlaylistReverseDownloadOrder.IsOn,
             TglPlaylistNumberTitles.IsOn,
-            _discoveryContext!.SubtitleLanguages.Where(x => x.ShouldSelect),
+            Enumerable.Empty<SubtitleLanguage>(),
             TglPlaylistExportM3U.IsOn,
-            TglPlaylistSplitChapters.IsOn,
-            TglPlaylistExportDescription.IsOn,
-            TglPlaylistExcludeFromHistory.IsOn,
-            (CmbPlaylistPostProcessorArgument.SelectedItem as BindableSelectionItem)!.ToSelectionItem<PostProcessorArgument?>()!);
+            false,
+            false,
+            false,
+            null);
     }
 
     private void TxtUrl_TextChanged(object? sender, TextChangedEventArgs e) => IsPrimaryButtonEnabled = !TxtUrl.Text.StartsWith("//") && Uri.TryCreate(TxtUrl.Text, UriKind.Absolute, out var _);
@@ -303,7 +256,6 @@ public sealed partial class AddDownloadDialog : ContentDialog
     {
         ViewStackSingle.SelectedIndex = (NavViewSingle.SelectedItem.Tag as string)! switch
         {
-            "Subtitles" => (int)SinglePages.Subtitles,
             "Advanced" => (int)SinglePages.Advanced,
             _ => (int)SinglePages.General
         };
@@ -341,16 +293,11 @@ public sealed partial class AddDownloadDialog : ContentDialog
         CmbSingleAudioFormat.SelectSelectionItemByFormatId(_controller.PreviousAudioFormatIds[selectedFileType.Value]);
     }
 
-    private void BtnSingleSelectAllSubtitles_Click(object? sender, RoutedEventArgs e) => ListSingleSubtitles.SelectAll();
-
-    private void BtnSingleDeselectAllSubtitles_Click(object? sender, RoutedEventArgs e) => ListSingleSubtitles.DeselectAll();
-
     private void NavViewPlaylist_SelectionChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
     {
         ViewStackPlaylist.SelectedIndex = (NavViewPlaylist.SelectedItem.Tag as string)! switch
         {
             "Items" => (int)PlaylistPages.Items,
-            "Subtitles" => (int)PlaylistPages.Subtitles,
             "Advanced" => (int)PlaylistPages.Advanced,
             _ => (int)PlaylistPages.General
         };
@@ -403,42 +350,5 @@ public sealed partial class AddDownloadDialog : ContentDialog
             totalDuration += ((BindableMediaSelectionItem)selectedItem).Duration;
         }
         LblPlaylistItemsTime.Text = $"Общая длительность: {totalDuration}";
-    }
-
-    private void BtnPlaylistSelectAllSubtitles_Click(object? sender, RoutedEventArgs e) => ListPlaylistSubtitles.SelectAll();
-
-    private void BtnPlaylistDeselectAllSubtitles_Click(object? sender, RoutedEventArgs e) => ListPlaylistSubtitles.DeselectAll();
-
-    private void TxtSingleSubtitlesSearch_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs e)
-    {
-        if (_discoveryContext is null) return;
-        var searchText = TxtSingleSubtitlesSearch.Text.Trim();
-        _isUpdatingSubtitleSelection = true;
-        ListSingleSubtitles.ItemsSource = string.IsNullOrEmpty(searchText) ? _discoveryContext.SubtitleLanguages.ToBindableSelectonItems() : _discoveryContext.SubtitleLanguages.Where(x => x.Value.Language.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToBindableSelectonItems();
-        ListSingleSubtitles.SelectSelectionItems();
-        _isUpdatingSubtitleSelection = false;
-    }
-
-    private void TxtPlaylistSubtitlesSearch_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs e)
-    {
-        if (_discoveryContext is null) return;
-        var searchText = TxtPlaylistSubtitlesSearch.Text.Trim();
-        _isUpdatingSubtitleSelection = true;
-        ListPlaylistSubtitles.ItemsSource = string.IsNullOrEmpty(searchText) ? _discoveryContext.SubtitleLanguages.ToBindableSelectonItems() : _discoveryContext.SubtitleLanguages.Where(x => x.Value.Language.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToBindableSelectonItems();
-        ListPlaylistSubtitles.SelectSelectionItems();
-        _isUpdatingSubtitleSelection = false;
-    }
-
-    private void ListSubtitles_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (_isUpdatingSubtitleSelection) return;
-        foreach (var item in e.AddedItems)
-        {
-            (item as BindableSelectionItem)!.ShouldSelect = true;
-        }
-        foreach (var item in e.RemovedItems)
-        {
-            (item as BindableSelectionItem)!.ShouldSelect = false;
-        }
     }
 }
