@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.Windows.Storage.Pickers;
+using Nickvision.Desktop.Application;
 using Nickvision.Desktop.Globalization;
 using Nickvision.Desktop.Keyring;
 using Nickvision.Desktop.WinUI.Helpers;
