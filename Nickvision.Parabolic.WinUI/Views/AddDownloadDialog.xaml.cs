@@ -218,11 +218,11 @@ public sealed partial class AddDownloadDialog : ContentDialog
         (CmbSingleFileType.SelectedItem as BindableSelectionItem)!.ToSelectionItem<MediaFileType>()!,
         (CmbSingleVideoFormat.SelectedItem as BindableSelectionItem)!.ToSelectionItem<Format>()!,
         (CmbSingleAudioFormat.SelectedItem as BindableSelectionItem)!.ToSelectionItem<Format>()!,
-        Enumerable.Empty<SubtitleLanguage>(),
+        Enumerable.Empty<SelectionItem<SubtitleLanguage>>(),
         false,
         false,
         false,
-        null,
+        new SelectionItem<PostProcessorArgument?>(null, "", true),
         TxtSingleStartTime.Text,
         TxtSingleEndTime.Text
     );
@@ -242,12 +242,12 @@ public sealed partial class AddDownloadDialog : ContentDialog
             (CmbPlaylistSuggestedAudioBitrate.SelectedItem as BindableSelectionItem)!.ToSelectionItem<double>()!,
             TglPlaylistReverseDownloadOrder.IsOn,
             TglPlaylistNumberTitles.IsOn,
-            Enumerable.Empty<SubtitleLanguage>(),
+            Enumerable.Empty<SelectionItem<SubtitleLanguage>>(),
             TglPlaylistExportM3U.IsOn,
             false,
             false,
             false,
-            null);
+            new SelectionItem<PostProcessorArgument?>(null, "", true));
     }
 
     private void TxtUrl_TextChanged(object? sender, TextChangedEventArgs e) => IsPrimaryButtonEnabled = !TxtUrl.Text.StartsWith("//") && Uri.TryCreate(TxtUrl.Text, UriKind.Absolute, out var _);
