@@ -30,7 +30,6 @@
                     </Grid.ColumnDefinitions>
 
                     <ImageIcon Grid.Column="0" VerticalAlignment="Center" Height="18" Source="/Assets/papa_cat.ico"/>
-
                     <TextBlock x:Name="LblTitle" Grid.Column="1" Margin="12,0,6,0" VerticalAlignment="Center" Style="{ThemeResource CaptionTextBlockStyle}"/>
 
                     <MenuBar Grid.Column="2">
@@ -51,25 +50,6 @@
                                 </MenuFlyoutItem.KeyboardAccelerators>
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                        </MenuBarItem>
-
-                        <MenuBarItem x:Name="MenuEdit">
-                            <MenuFlyoutItem x:Name="MenuKeyring" Click="Keyring">
-                                <MenuFlyoutItem.KeyboardAccelerators>
-                                    <KeyboardAccelerator Key="K" Modifiers="Control"/>
-                                </MenuFlyoutItem.KeyboardAccelerators>
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE72E;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                            <MenuFlyoutItem x:Name="MenuSettings" Click="Settings">
-                                <MenuFlyoutItem.KeyboardAccelerators>
-                                    <KeyboardAccelerator Key="I" Modifiers="Control"/>
-                                </MenuFlyoutItem.KeyboardAccelerators>
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE713;"/>
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
                         </MenuBarItem>
@@ -130,7 +110,6 @@
                             </Flyout>
                         </Button.Flyout>
                     </Button>
-
                     <Button x:Name="BtnUpdateProgress" Background="Transparent" BorderThickness="0" Visibility="Collapsed">
                         <Button.Content>
                             <ProgressRing x:Name="RingUpdateProcess" Width="24" Height="24" IsIndeterminate="False"/>
@@ -152,29 +131,13 @@
                 <nickvision:ViewStack.Pages>
                     <StackPanel Margin="48,48,48,48" HorizontalAlignment="Stretch" Orientation="Vertical" Spacing="12">
                         <Image HorizontalAlignment="Left" Width="64" Height="64" Source="/Assets/papa_cat.ico"/>
-                        <TextBlock x:Name="LblHomeTitle" HorizontalAlignment="Left" Style="{ThemeResource TitleTextBlockStyle}"/>
+                        <TextBlock x:Name="LblHomeTitle" HorizontalAlignment="Left" Style="{ThemeResource TitleTextBlockStyle}" TextWrapping="Wrap"/>
                         <TextBlock x:Name="LblHomeDescription" HorizontalAlignment="Left" Foreground="Gray"/>
                         <HyperlinkButton Margin="0,24,0,0" Click="AddDownload">
                             <HyperlinkButton.Content>
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
                                     <TextBlock x:Name="LblAddDownload"/>
-                                </StackPanel>
-                            </HyperlinkButton.Content>
-                        </HyperlinkButton>
-                        <HyperlinkButton Click="Keyring">
-                            <HyperlinkButton.Content>
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE72E;"/>
-                                    <TextBlock x:Name="LblKeyring"/>
-                                </StackPanel>
-                            </HyperlinkButton.Content>
-                        </HyperlinkButton>
-                        <HyperlinkButton Click="Settings">
-                            <HyperlinkButton.Content>
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE713;"/>
-                                    <TextBlock x:Name="LblSettings"/>
                                 </StackPanel>
                             </HyperlinkButton.Content>
                         </HyperlinkButton>
