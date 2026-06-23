@@ -130,7 +130,6 @@
             <nickvision:ViewStack x:Name="ViewStack" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <nickvision:ViewStack.Pages>
                     <StackPanel Margin="48,48,48,48" HorizontalAlignment="Stretch" Orientation="Vertical" Spacing="12">
-                        <Image HorizontalAlignment="Left" Width="64" Height="64" Source="/Assets/papa_cat.ico"/>
                         <TextBlock x:Name="LblHomeTitle" HorizontalAlignment="Left" Style="{ThemeResource TitleTextBlockStyle}" TextWrapping="Wrap"/>
                         <TextBlock x:Name="LblHomeDescription" HorizontalAlignment="Left" Foreground="Gray"/>
                         <HyperlinkButton Margin="0,24,0,0" Click="AddDownload">
