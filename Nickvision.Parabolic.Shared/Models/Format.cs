@@ -1,4 +1,4 @@
-﻿using Nickvision.Desktop.Globalization;
+using Nickvision.Desktop.Globalization;
 using System;
 using System.Text;
 using System.Text.Json;
@@ -223,159 +223,80 @@ public class Format : IComparable<Format>, IEquatable<Format>
 
     public string ToString(ITranslationService? translator)
     {
-        var result = new StringBuilder();
-        void AppendSection(string value)
+        // Спеціальні формати
+        switch (Id)
         {
-            if (string.IsNullOrEmpty(value))
+            case "BEST_VIDEO":
+            case "BEST_AUDIO":
+                return translator?._("Best") ?? "Найкраще";
+            case "WORST_VIDEO":
+            case "WORST_AUDIO":
+                return translator?._("Worst") ?? "Найгірше";
+            case "NONE_VIDEO":
+            case "NONE_AUDIO":
+                return translator?._("None") ?? "Немає";
+        }
+
+        var result = new StringBuilder();
+
+        if (Type == MediaType.Video)
+        {
+            // Роздільна здатність
+            if (VideoResolution is not null)
             {
-                return;
+                var height = VideoResolution.Height;
+                var label = height switch
+                {
+                    144 => "144p",
+                    240 => "240p",
+                    360 => "360p",
+                    480 => "480p",
+                    720 => "720p",
+                    1080 => "1080p",
+                    1440 => "1440p",
+                    >= 2160 => "4K",
+                    _ => $"{height}p"
+                };
+                result.Append(label);
+            }
+        }
+        else if (Type == MediaType.Audio)
+        {
+            // Бітрейт аудіо
+            if (Bitrate.HasValue)
+            {
+                result.Append($"{(int)Bitrate.Value}k");
+            }
+        }
+
+        // Розмір файлу
+        if (Bytes > 0)
+        {
+            const double mib = 1024d * 1024d;
+            const double gib = 1024d * 1024d * 1024d;
+            string sizeLabel;
+            if (Bytes > gib)
+            {
+                sizeLabel = $"{Bytes / gib:0.0} ГБ";
+            }
+            else
+            {
+                sizeLabel = $"{(int)(Bytes / mib)} МБ";
             }
             if (result.Length > 0)
             {
                 result.Append(" | ");
             }
-            result.Append(value);
+            result.Append(sizeLabel);
         }
-        if (Type == MediaType.Video)
-        {
-            if (VideoResolution is not null)
-            {
-                AppendSection(VideoResolution.ToString(translator));
-            }
-            if (!string.IsNullOrEmpty(AudioLanguage))
-            {
-                var language = AudioLanguage;
-                if (HasAudioDescription)
-                {
-                    language += $" ({translator?._("Audio Description") ?? "Audio Description"})";
-                }
-                AppendSection(language);
-            }
-            if (VideoCodec.HasValue)
-            {
-                AppendSection(VideoCodec.Value switch
-                {
-                    Models.VideoCodec.VP9 => "VP9",
-                    Models.VideoCodec.AV01 => "AV1",
-                    Models.VideoCodec.H264 => "H.264",
-                    Models.VideoCodec.H265 => "H.265",
-                    _ => string.Empty
-                });
-            }
-            if (FrameRate.HasValue)
-            {
-                AppendSection(FrameRate.Value switch
-                {
-                    Models.FrameRate.Fps24 => translator?._("{0} FPS", 24) ?? "24 FPS",
-                    Models.FrameRate.Fps30 => translator?._("{0} FPS", 30) ?? "30 FPS",
-                    Models.FrameRate.Fps60 => translator?._("{0} FPS", 60) ?? "60 FPS",
-                    _ => string.Empty
-                });
-            }
-            if (AudioCodec.HasValue)
-            {
-                AppendSection(AudioCodec.Value switch
-                {
-                    Models.AudioCodec.FLAC => "FLAC",
-                    Models.AudioCodec.WAV => "WAV",
-                    Models.AudioCodec.OPUS => "OPUS",
-                    Models.AudioCodec.AAC => "AAC",
-                    Models.AudioCodec.MP4A => "MP4A",
-                    Models.AudioCodec.MP3 => "MP3",
-                    _ => string.Empty
-                });
-            }
-            if (Bitrate.HasValue)
-            {
-                AppendSection($"{Bitrate.Value}k");
-            }
-        }
-        else if (Type == MediaType.Audio)
-        {
-            if (Bitrate.HasValue)
-            {
-                AppendSection($"{Bitrate.Value}k");
-            }
-            if (!string.IsNullOrEmpty(AudioLanguage))
-            {
-                var language = AudioLanguage;
-                if (HasAudioDescription)
-                {
-                    language += $" ({translator?._("Audio Description") ?? "Audio Description"})";
-                }
-                AppendSection(language);
-            }
-            if (AudioCodec.HasValue)
-            {
-                AppendSection(AudioCodec.Value switch
-                {
-                    Models.AudioCodec.FLAC => "FLAC",
-                    Models.AudioCodec.WAV => "WAV",
-                    Models.AudioCodec.OPUS => "OPUS",
-                    Models.AudioCodec.AAC => "AAC",
-                    Models.AudioCodec.MP4A => "MP4A",
-                    Models.AudioCodec.MP3 => "MP3",
-                    _ => string.Empty
-                });
-            }
-        }
-        else if (Type == MediaType.Image)
-        {
-            if (VideoResolution is not null)
-            {
-                AppendSection(VideoResolution.ToString(translator));
-            }
-        }
-        if (Bytes > 0)
-        {
-            const double gib = 1024d * 1024d * 1024d;
-            const double mib = 1024d * 1024d;
-            if (Bytes > gib)
-            {
-                AppendSection(translator?._("{0:0.00} GiB", Bytes / gib) ?? string.Format("{0:0.00} GiB", Bytes / gib));
-            }
-            else if (Bytes > mib)
-            {
-                AppendSection(translator?._("{0:0.00} MiB", Bytes / mib) ?? string.Format("{0:0.00} MiB", Bytes / mib));
-            }
-            else if (Bytes > 1024)
-            {
-                AppendSection(translator?._("{0:0.00} KiB", Bytes / 1024.0) ?? string.Format("{0:0.00} KiB", Bytes / 1024.0));
-            }
-            else
-            {
-                AppendSection(translator?._("{0:0.00} B", Bytes) ?? string.Format("{0:0.00} B", Bytes));
-            }
-        }
-        var idLabel = Id switch
-        {
-            "BEST_VIDEO" => translator?._("Best") ?? "Best",
-            "BEST_AUDIO" => translator?._("Best") ?? "Best",
-            "WORST_VIDEO" => translator?._("Worst") ?? "Worst",
-            "WORST_AUDIO" => translator?._("Worst") ?? "Worst",
-            "NONE_VIDEO" => translator?._("None") ?? "None",
-            "NONE_AUDIO" => translator?._("None") ?? "None",
-            _ => Id
-        };
-        if (result.Length == 0)
-        {
-            return idLabel;
-        }
-        result.Append(" (");
-        result.Append(idLabel);
-        result.Append(')');
-        return result.ToString();
+
+        return result.Length > 0 ? result.ToString() : Id;
     }
 
     public static bool operator >(Format left, Format right) => left.CompareTo(right) > 0;
-
     public static bool operator <(Format left, Format right) => left.CompareTo(right) < 0;
-
     public static bool operator >=(Format left, Format right) => left.CompareTo(right) >= 0;
-
     public static bool operator <=(Format left, Format right) => left.CompareTo(right) <= 0;
-
     public static bool operator ==(Format left, Format right) => left.Equals(right);
-
     public static bool operator !=(Format left, Format right) => !left.Equals(right);
 }
