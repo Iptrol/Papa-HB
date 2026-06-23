@@ -548,9 +548,9 @@ public class YtdlpExecutableService : DependencyExecutableService, IYtdlpExecuta
             var durSec = (long)downloadOptions.TimeFrame.Duration.TotalSeconds;
             var ffmpegTimeArgs = $"-ss {startSec} -t {durSec}";
             arguments.Add("--postprocessor-args");
-            arguments.Add($"Merger+ffmpeg_i:{ffmpegTimeArgs}");
+            arguments.Add($"Merger+ffmpeg_o:{ffmpegTimeArgs}");
             arguments.Add("--postprocessor-args");
-            arguments.Add($"VideoRemuxer+ffmpeg_i:{ffmpegTimeArgs}");
+            arguments.Add($"VideoRemuxer+ffmpeg_o:{ffmpegTimeArgs}");
             arguments.Add("--postprocessor-args");
             arguments.Add($"ExtractAudio+ffmpeg_i:{ffmpegTimeArgs}");
         }
