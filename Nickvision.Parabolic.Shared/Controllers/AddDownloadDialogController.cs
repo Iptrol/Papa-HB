@@ -120,7 +120,7 @@ public class AddDownloadDialogController
                 SplitChapters = splitChapters,
                 ExportDescription = exportDescription,
                 PostProcessorArgument = selectedPostProcessorArgument.Value,
-                TimeFrame = TimeFrame.TryParse(item.StartTime, item.EndTime, media.TimeFrame.Duration, out var timeFrame) && timeFrame != media.TimeFrame ? timeFrame : null
+                TimeFrame = TimeFrame.TryParse(item.StartTime, item.EndTime, media.TimeFrame.Duration, out var timeFrame) ? timeFrame : null
             });
         }
         using var transaction = await _configurationService.CreateTransactionAsync();
@@ -194,7 +194,7 @@ public class AddDownloadDialogController
             SplitChapters = splitChapters,
             ExportDescription = exportDescription,
             PostProcessorArgument = selectedPostProcessorArgument.Value,
-            TimeFrame = TimeFrame.TryParse(startTime, endTime, media.TimeFrame.Duration, out var timeFrame) && timeFrame != media.TimeFrame ? timeFrame : null
+            TimeFrame = TimeFrame.TryParse(startTime, endTime, media.TimeFrame.Duration, out var timeFrame) ? timeFrame : null
         };
         using var transaction = await _configurationService.CreateTransactionAsync();
         _configurationService.PreviousSaveFolder = options.SaveFolder;
