@@ -54,17 +54,6 @@
                             </MenuFlyoutItem>
                         </MenuBarItem>
 
-                        <MenuBarItem x:Name="MenuView">
-                            <MenuFlyoutItem x:Name="MenuHistory" Click="History">
-                                <MenuFlyoutItem.KeyboardAccelerators>
-                                    <KeyboardAccelerator Key="H" Modifiers="Control"/>
-                                </MenuFlyoutItem.KeyboardAccelerators>
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE81C;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                        </MenuBarItem>
-
                         <MenuBarItem x:Name="MenuDownloads">
                             <MenuFlyoutItem x:Name="MenuStopAllRemaining" Click="StopAllRemaining">
                                 <MenuFlyoutItem.KeyboardAccelerators>
@@ -246,6 +235,14 @@
                                     </NavigationViewItem.InfoBadge>
                                 </NavigationViewItem>
                             </NavigationView.MenuItems>
+
+                            <NavigationView.FooterMenuItems>
+                                <NavigationViewItem x:Name="NavHistory" Tag="history" Tapped="NavHistory_Tapped">
+                                    <NavigationViewItem.Icon>
+                                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE81C;"/>
+                                    </NavigationViewItem.Icon>
+                                </NavigationViewItem>
+                            </NavigationView.FooterMenuItems>
 
                             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                 <nickvision:ViewStack x:Name="ViewStackDownloads">
