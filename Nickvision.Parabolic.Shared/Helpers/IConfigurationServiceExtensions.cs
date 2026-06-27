@@ -80,7 +80,7 @@ public static class IConfigurationServiceExtensions
 
         public bool EmbedThumbnails
         {
-            get => configurationService.Get("EmbedThumbnails", true);
+            get => configurationService.Get("EmbedThumbnails", false);
 
             set => configurationService.Set("EmbedThumbnails", value);
         }
