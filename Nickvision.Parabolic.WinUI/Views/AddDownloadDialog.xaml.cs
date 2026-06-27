@@ -3,7 +3,6 @@ using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.Windows.Storage.Pickers;
 using Nickvision.Desktop.Application;
 using Nickvision.Desktop.Globalization;
 using Nickvision.Desktop.Keyring;
@@ -19,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
+using Windows.Storage.Pickers;
 
 namespace Nickvision.Parabolic.WinUI.Views;
 
@@ -269,11 +269,12 @@ public sealed partial class AddDownloadDialog : ContentDialog
         BtnSingleSelectSaveFolder.IsEnabled = false;
         try
         {
-            var picker = new FolderPicker(WindowId!.Value)
-            {
-                SuggestedStartLocation = PickerLocationId.Downloads
-            };
-            await Task.Yield();
+            var picker = new FolderPicker();
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, 
+                WinRT.Interop.WindowNative.GetWindowHandle(
+                    Microsoft.UI.Xaml.Application.Current as App));
+            picker.SuggestedStartLocation = PickerLocationId.Downloads;
+            picker.FileTypeFilter.Add("*");
             var folder = await picker.PickSingleFolderAsync();
             if (folder is not null)
             {
@@ -309,11 +310,12 @@ public sealed partial class AddDownloadDialog : ContentDialog
         BtnPlaylistSelectSaveFolder.IsEnabled = false;
         try
         {
-            var picker = new FolderPicker(WindowId!.Value)
-            {
-                SuggestedStartLocation = PickerLocationId.Downloads
-            };
-            await Task.Yield();
+            var picker = new FolderPicker();
+            WinRT.Interop.InitializeWithWindow.Initialize(picker,
+                WinRT.Interop.WindowNative.GetWindowHandle(
+                    Microsoft.UI.Xaml.Application.Current as App));
+            picker.SuggestedStartLocation = PickerLocationId.Downloads;
+            picker.FileTypeFilter.Add("*");
             var folder = await picker.PickSingleFolderAsync();
             if (folder is not null)
             {
