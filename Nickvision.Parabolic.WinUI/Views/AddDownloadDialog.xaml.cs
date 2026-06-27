@@ -270,9 +270,8 @@ public sealed partial class AddDownloadDialog : ContentDialog
         try
         {
             var picker = new FolderPicker();
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, 
-                WinRT.Interop.WindowNative.GetWindowHandle(
-                    Microsoft.UI.Xaml.Application.Current as App));
+            var hwnd = Microsoft.UI.Win32Interop.GetWindowFromWindowId(WindowId!.Value);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
             picker.SuggestedStartLocation = PickerLocationId.Downloads;
             picker.FileTypeFilter.Add("*");
             var folder = await picker.PickSingleFolderAsync();
@@ -311,9 +310,8 @@ public sealed partial class AddDownloadDialog : ContentDialog
         try
         {
             var picker = new FolderPicker();
-            WinRT.Interop.InitializeWithWindow.Initialize(picker,
-                WinRT.Interop.WindowNative.GetWindowHandle(
-                    Microsoft.UI.Xaml.Application.Current as App));
+            var hwnd = Microsoft.UI.Win32Interop.GetWindowFromWindowId(WindowId!.Value);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
             picker.SuggestedStartLocation = PickerLocationId.Downloads;
             picker.FileTypeFilter.Add("*");
             var folder = await picker.PickSingleFolderAsync();
