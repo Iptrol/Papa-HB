@@ -78,8 +78,6 @@ public sealed partial class MainWindow : Window
         MenuFile.Title = "Файл";
         MenuAddDownload.Text = "Добавить загрузку";
         MenuExit.Text = "Выход";
-        MenuView.Title = "Вид";
-        MenuHistory.Text = "История";
         MenuDownloads.Title = "Загрузки";
         MenuStopAllRemaining.Text = "Остановить все";
         MenuRetryAllFailed.Text = "Повторить неудачные";
@@ -98,6 +96,7 @@ public sealed partial class MainWindow : Window
         NavDownloadsQueued.Content = "В очереди";
         NavDownloadsCompleted.Content = "Завершённые";
         NavDownloadsFailed.Content = "Ошибки";
+        NavHistory.Content = "История";
         StatusNoneDownloads.Title = "Нет загрузок";
         StatusNoneDownloads.Description = "Загрузок этого типа пока нет";
         LblNoneAddDownload.Text = "Добавить ссылку";
@@ -381,14 +380,6 @@ public sealed partial class MainWindow : Window
     private async void AddDownload(object? sender, RoutedEventArgs e) => await AddDownloadAsync(null);
     private void Exit(object sender, RoutedEventArgs args) => Window_Closing(AppWindow, null!);
 
-    private async void Keyring(object sender, RoutedEventArgs args)
-    {
-        var keyringDialog = _serviceProvider.GetRequiredService<KeyringDialog>();
-        keyringDialog.RequestedTheme = MainGrid.ActualTheme;
-        keyringDialog.XamlRoot = MainGrid.XamlRoot;
-        await keyringDialog.ShowAsync();
-    }
-
     private void Settings(object sender, RoutedEventArgs args)
     {
         TitleBar.IsBackButtonVisible = true;
@@ -400,6 +391,15 @@ public sealed partial class MainWindow : Window
 
     private async void History(object sender, RoutedEventArgs args)
     {
+        var historyDialog = _serviceProvider.GetRequiredService<HistoryDialog>();
+        historyDialog.RequestedTheme = MainGrid.ActualTheme;
+        historyDialog.XamlRoot = MainGrid.XamlRoot;
+        await historyDialog.ShowAsync();
+    }
+
+    private async void NavHistory_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+    {
+        NavViewDownloads.SelectedItem = null;
         var historyDialog = _serviceProvider.GetRequiredService<HistoryDialog>();
         historyDialog.RequestedTheme = MainGrid.ActualTheme;
         historyDialog.XamlRoot = MainGrid.XamlRoot;
