@@ -26,7 +26,7 @@ public class TimeFrame : IEquatable<TimeFrame>
     }
     public static TimeFrame? Parse(string start, string end, TimeSpan duration)
     {
-        if (string.IsNullOrEmpty(start) || string.IsNullOrEmpty(end) || duration.TotalSeconds <= 0)
+        if (string.IsNullOrEmpty(start) || string.IsNullOrEmpty(end))
         {
             return null;
         }
@@ -40,7 +40,7 @@ public class TimeFrame : IEquatable<TimeFrame>
         {
             var startTimeSpan = new TimeSpan(int.Parse(startParts[0]), int.Parse(startParts[1]), int.Parse(startParts[2]));
             var endTimeSpan = new TimeSpan(int.Parse(endParts[0]), int.Parse(endParts[1]), int.Parse(endParts[2]));
-            if (startTimeSpan < TimeSpan.Zero || endTimeSpan <= startTimeSpan || endTimeSpan >= duration)
+            if (startTimeSpan < TimeSpan.Zero || endTimeSpan <= startTimeSpan)
             {
                 return null;
             }
