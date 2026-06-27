@@ -40,10 +40,6 @@ public class TimeFrame : IEquatable<TimeFrame>
         {
             var startTimeSpan = new TimeSpan(int.Parse(startParts[0]), int.Parse(startParts[1]), int.Parse(startParts[2]));
             var endTimeSpan = new TimeSpan(int.Parse(endParts[0]), int.Parse(endParts[1]), int.Parse(endParts[2]));
-            if (startTimeSpan < TimeSpan.Zero || endTimeSpan <= startTimeSpan)
-            {
-                return null;
-            }
             return new TimeFrame(startTimeSpan, endTimeSpan);
         }
         catch
