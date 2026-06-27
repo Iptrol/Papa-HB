@@ -545,14 +545,12 @@ public class YtdlpExecutableService : DependencyExecutableService, IYtdlpExecuta
         if (downloadOptions.TimeFrame is not null)
         {
             var startSec = (long)downloadOptions.TimeFrame.Start.TotalSeconds;
-            var durSec = (long)downloadOptions.TimeFrame.Duration.TotalSeconds;
-            var ffmpegTimeArgs = $"-ss {startSec} -t {durSec}";
+            var endSec = (long)downloadOptions.TimeFrame.End.TotalSeconds;
+            arguments.Add("--download-sections");
+            arguments.Add($"*{startSec}-{endSec}");
+            arguments.Add("--force-keyframes-at-cuts");
             arguments.Add("--postprocessor-args");
-            arguments.Add($"Merger+ffmpeg_i:{ffmpegTimeArgs}");
-            arguments.Add("--postprocessor-args");
-            arguments.Add($"VideoRemuxer+ffmpeg_i:{ffmpegTimeArgs}");
-            arguments.Add("--postprocessor-args");
-            arguments.Add($"ExtractAudio+ffmpeg_i:{ffmpegTimeArgs}");
+            arguments.Add($"ExtractAudio+ffmpeg_i:-ss {startSec} -t {(long)downloadOptions.TimeFrame.Duration.TotalSeconds}");
         }
         arguments.AddRange(_configurationService.YtdlpDownloadArgs.SplitCommandLine());
         return new Process()
