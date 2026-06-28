@@ -93,7 +93,6 @@ public sealed partial class MainWindow : Window
         LblDownloadsAddDownload.Text = "Добавить";
         NavDownloadsAll.Content = "Все";
         NavDownloadsRunning.Content = "Идут";
-        NavDownloadsQueued.Content = "В очереди";
         NavDownloadsCompleted.Content = "Завершённые";
         NavDownloadsFailed.Content = "Ошибки";
         NavHistory.Content = "История";
@@ -485,7 +484,6 @@ public sealed partial class MainWindow : Window
             if (selectedTag switch
             {
                 "1" => row.Status == DownloadStatus.Running || row.Status == DownloadStatus.Paused,
-                "2" => row.Status == DownloadStatus.Queued,
                 "3" => row.Status == DownloadStatus.Success || row.Status == DownloadStatus.Error || row.Status == DownloadStatus.Stopped,
                 "4" => row.Status == DownloadStatus.Error,
                 _ => true
@@ -501,8 +499,6 @@ public sealed partial class MainWindow : Window
         InfoBadgeDownloadsAll.Visibility = _controller.RemainingDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
         InfoBadgeDownloadsRunning.Value = _controller.RunningDownloadsCount;
         InfoBadgeDownloadsRunning.Visibility = _controller.RunningDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
-        InfoBadgeDownloadsQueued.Value = _controller.QueuedDownloadsCount;
-        InfoBadgeDownloadsQueued.Visibility = _controller.QueuedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
         InfoBadgeDownloadsCompleted.Value = _controller.CompletedDownloadsCount;
         InfoBadgeDownloadsCompleted.Visibility = _controller.CompletedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
         InfoBadgeDownloadsFailed.Value = _controller.FailedDownloadsCount;
