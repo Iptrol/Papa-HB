@@ -107,6 +107,7 @@ public partial class Download : IDisposable
         }
         _removeSourceData = _configurationService.RemoveSourceData;
         _process = _ytdlpExecutableService.GetDownloadProcess(Options);
+        _process.EnableRaisingEvents = true;
         Status = DownloadStatus.Running;
         _process.Exited += Process_Exited;
         _process.OutputDataReceived += Process_OutputDataReceived;
@@ -151,11 +152,9 @@ public partial class Download : IDisposable
         {
             try
             {
-                // Використовуємо _lastFilePath який оновлювався під час завантаження
                 var finalPath = _lastFilePath;
                 if (string.IsNullOrEmpty(finalPath) || !File.Exists(finalPath))
                 {
-                    // Fallback — шукаємо в логу
                     var log = _logBuilder.ToString();
                     var endIndex = log.Length;
                     for (var i = 0; i < 5 && endIndex > 0; i++)
@@ -249,8 +248,6 @@ public partial class Download : IDisposable
             }
             return;
         }
-
-        // Зберігаємо шлях до файлу окремо щоб не втратити його при обрізці логу
         if (e.Data.Length > 3 && e.Data[1] == ':' && (e.Data.EndsWith(".mp4") || e.Data.EndsWith(".mp3") || e.Data.EndsWith(".mkv") || e.Data.EndsWith(".webm") || e.Data.EndsWith(".m4a") || e.Data.EndsWith(".opus") || e.Data.EndsWith(".flac") || e.Data.EndsWith(".wav") || e.Data.EndsWith(".ogg") || e.Data.EndsWith(".mov") || e.Data.EndsWith(".avi")))
         {
             if (File.Exists(e.Data.Trim()))
@@ -258,13 +255,10 @@ public partial class Download : IDisposable
                 _lastFilePath = e.Data.Trim();
             }
         }
-
-        // Обмежуємо розмір логу
         if (_logBuilder.Length < MaxLogLength)
         {
             _logBuilder.AppendLine(e.Data);
         }
-
         try
         {
             if (e.Data.StartsWith("[Parabolic] Progress", StringComparison.Ordinal))
