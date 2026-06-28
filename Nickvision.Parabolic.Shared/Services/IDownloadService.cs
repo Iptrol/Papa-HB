@@ -1,11 +1,9 @@
-﻿using Nickvision.Parabolic.Shared.Events;
+using Nickvision.Parabolic.Shared.Events;
 using Nickvision.Parabolic.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
 namespace Nickvision.Parabolic.Shared.Services;
-
 public interface IDownloadService
 {
     event EventHandler<DownloadAddedEventArgs>? DownloadAdded;
@@ -14,14 +12,11 @@ public interface IDownloadService
     event EventHandler<DownloadEventArgs>? DownloadRetired;
     event EventHandler<DownloadEventArgs>? DownloadStartedFromQueue;
     event EventHandler<DownloadEventArgs>? DownloadStopped;
-
     int DownloadingCount { get; }
     int QueuedCount { get; }
     int CompletedCount { get; }
     int FailedCount { get; }
-
     int RemainingCount => DownloadingCount + QueuedCount;
-
     Task AddAsync(DownloadOptions options, bool excludeFromHistory);
     Task AddAsync(IReadOnlyList<DownloadOptions> options, bool excludeFromHistory);
     IReadOnlyList<int> ClearCompleted();
@@ -33,4 +28,5 @@ public interface IDownloadService
     Task RetryFailedAsync();
     Task<bool> StopAsync(int id);
     Task StopAllAsync();
+    Task ForceStopAllAsync();
 }
