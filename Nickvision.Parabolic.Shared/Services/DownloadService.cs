@@ -364,11 +364,18 @@ public class DownloadService : IDisposable, IDownloadService
         await _recoveryService.RemoveAsync(e.Id);
         if (e.Status == DownloadStatus.Success)
         {
-            await _historyService.AddAsync(new HistoricDownload(download.Options.Url)
+            try
             {
-                Title = Path.GetFileNameWithoutExtension(download.FilePath),
-                Path = download.FilePath
-            });
+                await _historyService.AddAsync(new HistoricDownload(download.Options.Url)
+                {
+                    Title = Path.GetFileNameWithoutExtension(download.FilePath),
+                    Path = download.FilePath
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to add historic download ({e.Id}): {ex}");
+            }
             _logger.LogDebug($"Download completed ({e.Id}): {download.Log}");
         }
         else if (e.Status == DownloadStatus.Error)
