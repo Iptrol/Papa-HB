@@ -15,7 +15,10 @@ using Nickvision.Parabolic.Shared.Services;
 using Nickvision.Parabolic.WinUI.Controls;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
+using Windows.Storage;
 using Windows.System;
 
 namespace Nickvision.Parabolic.WinUI.Views;
@@ -431,7 +434,31 @@ public sealed partial class MainWindow : Window
         await Launcher.LaunchUriAsync(uri);
     }
 
-    private void UpdateDownloadsList()
+    private async void HistoryPlay_Click(object? sender, RoutedEventArgs e)
+    {
+        var path = ((sender as Button)!.Tag as string)!;
+        if (!File.Exists(path)) return;
+        try
+        {
+            using var _ = Process.Start(new ProcessStartInfo()
+            {
+                FileName = path,
+                UseShellExecute = true
+            });
+        }
+        catch
+        {
+            await Launcher.LaunchFileAsync(await StorageFile.GetFileFromPathAsync(path));
+        }
+    }
+
+    private async void HistoryDownloadAgain_Click(object? sender, RoutedEventArgs e)
+    {
+        var url = ((sender as Button)!.Tag as Uri)!;
+        await AddDownloadAsync(url);
+    }
+
+    private async void UpdateDownloadsList()
     {
         var selectedTag = ((NavViewDownloads.SelectedItem as NavigationViewItem)?.Tag as string) ?? string.Empty;
         var rows = new List<DownloadRow>(_downloadRows.Count);
@@ -459,5 +486,23 @@ public sealed partial class MainWindow : Window
         InfoBadgeDownloadsQueued.Visibility = _controller.QueuedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
         InfoBadgeDownloadsCompleted.Value = _controller.CompletedDownloadsCount;
         InfoBadgeDownloadsCompleted.Visibility = _controller.CompletedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+        if (selectedTag == "3" || selectedTag == "0")
+        {
+            var history = await _controller.GetHistoryAsync();
+            if (history.Count > 0)
+            {
+                ListHistory.ItemsSource = history;
+                PanelHistory.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                PanelHistory.Visibility = Visibility.Collapsed;
+            }
+        }
+        else
+        {
+            PanelHistory.Visibility = Visibility.Collapsed;
+        }
     }
 }
