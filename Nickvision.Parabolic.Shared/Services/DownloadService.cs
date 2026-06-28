@@ -76,14 +76,6 @@ public class DownloadService : IDisposable, IDownloadService
         download.Completed += Download_Completed;
         download.ProgressChanged += Download_ProgressChanged;
         await _recoveryService.AddAsync(new RecoverableDownload(download.Id, download.Options));
-        if (!excludeFromHistory)
-        {
-            await _historyService.AddAsync(new HistoricDownload(download.Options.Url)
-            {
-                Title = Path.GetFileNameWithoutExtension(download.FilePath),
-                Path = download.FilePath
-            });
-        }
         if (_downloading.Count < _configurationService.MaxNumberOfActiveDownloads)
         {
             _logger.LogDebug($"Starting download ({download.Id}).");
@@ -102,7 +94,6 @@ public class DownloadService : IDisposable, IDownloadService
     public async Task AddAsync(IReadOnlyList<DownloadOptions> options, bool excludeFromHistory)
     {
         var recoverableDownloads = new List<RecoverableDownload>();
-        var historicDownloads = new List<HistoricDownload>();
         var downloadsToStart = new List<Download>();
         foreach (var option in options)
         {
@@ -111,14 +102,6 @@ public class DownloadService : IDisposable, IDownloadService
             download.Completed += Download_Completed;
             download.ProgressChanged += Download_ProgressChanged;
             recoverableDownloads.Add(new RecoverableDownload(download.Id, download.Options));
-            if (!excludeFromHistory)
-            {
-                historicDownloads.Add(new HistoricDownload(download.Options.Url)
-                {
-                    Title = Path.GetFileNameWithoutExtension(download.FilePath),
-                    Path = download.FilePath
-                });
-            }
             if (_downloading.Count < _configurationService.MaxNumberOfActiveDownloads)
             {
                 _logger.LogDebug($"Starting download ({download.Id}).");
@@ -134,7 +117,6 @@ public class DownloadService : IDisposable, IDownloadService
             }
         }
         await _recoveryService.AddAsync(recoverableDownloads);
-        await _historyService.AddAsync(historicDownloads);
         foreach (var download in downloadsToStart)
         {
             download.Start();
@@ -380,13 +362,18 @@ public class DownloadService : IDisposable, IDownloadService
         _completed.Add(e.Id, download);
         _downloading.Remove(e.Id);
         await _recoveryService.RemoveAsync(e.Id);
-        if (e.Status == DownloadStatus.Error)
+        if (e.Status == DownloadStatus.Success)
+        {
+            await _historyService.AddAsync(new HistoricDownload(download.Options.Url)
+            {
+                Title = Path.GetFileNameWithoutExtension(download.FilePath),
+                Path = download.FilePath
+            });
+            _logger.LogDebug($"Download completed ({e.Id}): {download.Log}");
+        }
+        else if (e.Status == DownloadStatus.Error)
         {
             _logger.LogError($"Download failed ({e.Id}): {download.Log}");
-        }
-        else if (e.Status == DownloadStatus.Success)
-        {
-            _logger.LogDebug($"Download completed ({e.Id}): {download.Log}");
         }
         else if (e.Status == DownloadStatus.Stopped)
         {
