@@ -369,6 +369,18 @@ public class MainWindowController
         }
     }
 
+    public async Task ForceCloseAsync()
+    {
+        try
+        {
+            await _downloadService.ForceStopAllAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"An error occurred while force closing: {e}");
+        }
+    }
+
     public async Task<bool> StopDownloadAsync(int id)
     {
         try
