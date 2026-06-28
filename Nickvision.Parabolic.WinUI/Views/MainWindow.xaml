@@ -5,6 +5,7 @@
     xmlns:local="using:Nickvision.Parabolic.WinUI.Views"
     xmlns:nickvision="using:Nickvision.Desktop.WinUI.Controls"
     xmlns:community="using:CommunityToolkit.WinUI.Controls"
+    xmlns:models="using:Nickvision.Parabolic.Shared.Models"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -184,26 +185,25 @@
                             </nickvision:ViewStack.Pages>
                         </nickvision:ViewStack>
 
-                        <!-- Секція історії — видима тільки у "Завершённые" -->
                         <StackPanel x:Name="PanelHistory" Margin="12,12,12,0" Visibility="Collapsed" Orientation="Vertical" Spacing="6">
                             <MenuFlyoutSeparator/>
                             <TextBlock Text="Предыдущие сессии" Foreground="Gray" Margin="0,6,0,6"/>
                             <ListView x:Name="ListHistory" SelectionMode="None">
                                 <ListView.ItemTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate x:DataType="models:HistoricDownload">
                                         <Grid ColumnSpacing="6" Padding="0,6,0,6">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="{Binding Title}" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                                            <Button Grid.Column="1" Tag="{Binding Path}" Click="HistoryPlay_Click">
+                                            <TextBlock Grid.Column="0" Text="{x:Bind Title}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                            <Button Grid.Column="1" Tag="{x:Bind Path}" Click="HistoryPlay_Click">
                                                 <Button.Content>
                                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE768;" FontSize="16"/>
                                                 </Button.Content>
                                             </Button>
-                                            <Button Grid.Column="2" Tag="{Binding Url}" Click="HistoryDownloadAgain_Click">
+                                            <Button Grid.Column="2" Tag="{x:Bind Url}" Click="HistoryDownloadAgain_Click">
                                                 <Button.Content>
                                                     <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE896;" FontSize="16"/>
                                                 </Button.Content>
