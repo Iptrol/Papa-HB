@@ -67,13 +67,11 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- Шапка з привітанням — завжди видима -->
             <StackPanel Grid.Row="0" Margin="24,12,24,12" Orientation="Vertical" Spacing="4">
                 <TextBlock x:Name="LblHomeTitle" HorizontalAlignment="Left" Style="{ThemeResource TitleTextBlockStyle}" TextWrapping="Wrap"/>
                 <TextBlock x:Name="LblHomeDescription" HorizontalAlignment="Left" Foreground="Gray"/>
             </StackPanel>
 
-            <!-- Панель кнопок -->
             <Grid Grid.Row="1" Margin="12,0,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -119,7 +117,6 @@
                 </CommandBar>
             </Grid>
 
-            <!-- Список завантажень -->
             <NavigationView x:Name="NavViewDownloads" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                             IsPaneToggleButtonVisible="False" IsBackButtonVisible="Collapsed" IsSettingsVisible="False"
                             PaneDisplayMode="Left" OpenPaneLength="240" SelectionChanged="NavViewDownloads_SelectionChanged">
@@ -164,27 +161,59 @@
                 </NavigationView.MenuItems>
 
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                    <nickvision:ViewStack x:Name="ViewStackDownloads">
-                        <nickvision:ViewStack.Pages>
-                            <nickvision:StatusPage x:Name="StatusNoneDownloads" Glyph="&#xE896;">
-                                <nickvision:StatusPage.Child>
-                                    <Button Click="AddDownload">
-                                        <Button.Content>
-                                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                                <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
-                                                <TextBlock x:Name="LblNoneAddDownload"/>
-                                            </StackPanel>
-                                        </Button.Content>
-                                    </Button>
-                                </nickvision:StatusPage.Child>
-                            </nickvision:StatusPage>
-                            <ItemsRepeater x:Name="ListDownloads" Margin="12,6,12,0">
-                                <ItemsRepeater.Layout>
-                                    <StackLayout Spacing="6"/>
-                                </ItemsRepeater.Layout>
-                            </ItemsRepeater>
-                        </nickvision:ViewStack.Pages>
-                    </nickvision:ViewStack>
+                    <StackPanel Orientation="Vertical" Spacing="0">
+                        <nickvision:ViewStack x:Name="ViewStackDownloads">
+                            <nickvision:ViewStack.Pages>
+                                <nickvision:StatusPage x:Name="StatusNoneDownloads" Glyph="&#xE896;">
+                                    <nickvision:StatusPage.Child>
+                                        <Button Click="AddDownload">
+                                            <Button.Content>
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
+                                                    <TextBlock x:Name="LblNoneAddDownload"/>
+                                                </StackPanel>
+                                            </Button.Content>
+                                        </Button>
+                                    </nickvision:StatusPage.Child>
+                                </nickvision:StatusPage>
+                                <ItemsRepeater x:Name="ListDownloads" Margin="12,6,12,0">
+                                    <ItemsRepeater.Layout>
+                                        <StackLayout Spacing="6"/>
+                                    </ItemsRepeater.Layout>
+                                </ItemsRepeater>
+                            </nickvision:ViewStack.Pages>
+                        </nickvision:ViewStack>
+
+                        <!-- Секція історії — видима тільки у "Завершённые" -->
+                        <StackPanel x:Name="PanelHistory" Margin="12,12,12,0" Visibility="Collapsed" Orientation="Vertical" Spacing="6">
+                            <MenuFlyoutSeparator/>
+                            <TextBlock Text="Предыдущие сессии" Foreground="Gray" Margin="0,6,0,6"/>
+                            <ListView x:Name="ListHistory" SelectionMode="None">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid ColumnSpacing="6" Padding="0,6,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding Title}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                            <Button Grid.Column="1" Tag="{Binding Path}" Click="HistoryPlay_Click">
+                                                <Button.Content>
+                                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE768;" FontSize="16"/>
+                                                </Button.Content>
+                                            </Button>
+                                            <Button Grid.Column="2" Tag="{Binding Url}" Click="HistoryDownloadAgain_Click">
+                                                <Button.Content>
+                                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE896;" FontSize="16"/>
+                                                </Button.Content>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
+                    </StackPanel>
                 </ScrollViewer>
             </NavigationView>
 
