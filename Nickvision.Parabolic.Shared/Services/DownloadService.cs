@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Nickvision.Desktop.Application;
 using Nickvision.Desktop.Globalization;
 using Nickvision.Parabolic.Shared.Events;
@@ -318,6 +318,31 @@ public class DownloadService : IDisposable, IDownloadService
         _queued.Clear();
         await _recoveryService.RemoveAsync(ids);
         _logger.LogDebug($"Stopped {ids.Count} download(s).");
+    }
+
+    public Task ForceStopAllAsync()
+    {
+        _logger.LogDebug($"Force stopping all downloads (keeping recovery)...");
+        foreach (var pair in _downloading)
+        {
+            pair.Value.Stop();
+            pair.Value.Completed -= Download_Completed;
+            pair.Value.ProgressChanged -= Download_ProgressChanged;
+            pair.Value.Dispose();
+            _logger.LogDebug($"Force stopped download ({pair.Key}).");
+        }
+        foreach (var pair in _queued)
+        {
+            pair.Value.Stop();
+            pair.Value.Completed -= Download_Completed;
+            pair.Value.ProgressChanged -= Download_ProgressChanged;
+            pair.Value.Dispose();
+            _logger.LogDebug($"Force stopped queued download ({pair.Key}).");
+        }
+        _downloading.Clear();
+        _queued.Clear();
+        _logger.LogDebug("Force stopped all downloads, recovery queue preserved.");
+        return Task.CompletedTask;
     }
 
     private void Dispose(bool disposing)
