@@ -335,6 +335,7 @@ public sealed partial class MainWindow : Window
 
     private async void DownloadRow_RetryRequested(object? sender, int id) => await _controller.RetryDownloadAsync(id);
     private async void DownloadRow_StopRequested(object? sender, int id) => await _controller.StopDownloadAsync(id);
+
     private void NavViewDownloads_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
         UpdateDownloadsList();
@@ -440,8 +441,7 @@ public sealed partial class MainWindow : Window
 
     private async void HistoryPlay_Click(object? sender, RoutedEventArgs e)
     {
-        var path = ((sender as Button)!.Tag as string)!;
-        if (!File.Exists(path)) return;
+        if (sender is not Button btn || btn.Tag is not string path || !File.Exists(path)) return;
         try
         {
             using var _ = Process.Start(new ProcessStartInfo()
@@ -452,13 +452,17 @@ public sealed partial class MainWindow : Window
         }
         catch
         {
-            await Launcher.LaunchFileAsync(await StorageFile.GetFileFromPathAsync(path));
+            try
+            {
+                await Launcher.LaunchFileAsync(await StorageFile.GetFileFromPathAsync(path));
+            }
+            catch { }
         }
     }
 
     private async void HistoryDownloadAgain_Click(object? sender, RoutedEventArgs e)
     {
-        var url = ((sender as Button)!.Tag as Uri)!;
+        if (sender is not Button btn || btn.Tag is not Uri url) return;
         await AddDownloadAsync(url);
     }
 
@@ -498,13 +502,20 @@ public sealed partial class MainWindow : Window
         var selectedTag = ((NavViewDownloads.SelectedItem as NavigationViewItem)?.Tag as string) ?? string.Empty;
         if (selectedTag == "3" || selectedTag == "0")
         {
-            var history = await _controller.GetHistoryAsync();
-            if (history.Count > 0)
+            try
             {
-                ListHistory.ItemsSource = history;
-                PanelHistory.Visibility = Visibility.Visible;
+                var history = await _controller.GetHistoryAsync();
+                if (history.Count > 0)
+                {
+                    ListHistory.ItemsSource = history;
+                    PanelHistory.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    PanelHistory.Visibility = Visibility.Collapsed;
+                }
             }
-            else
+            catch
             {
                 PanelHistory.Visibility = Visibility.Collapsed;
             }
