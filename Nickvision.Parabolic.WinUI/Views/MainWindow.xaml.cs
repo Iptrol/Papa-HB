@@ -171,7 +171,7 @@ public sealed partial class MainWindow : Window
             if ((await confirmDialog.ShowAsync()) == ContentDialogResult.Primary)
             {
                 _controller.WindowGeometry = this.Geometry;
-                await _controller.StopAllDownloadsAsync();
+                await _controller.ForceCloseAsync();
                 Close();
                 _serviceProvider.GetRequiredService<IHostApplicationLifetime>().StopApplication();
             }
@@ -486,7 +486,6 @@ public sealed partial class MainWindow : Window
         InfoBadgeDownloadsQueued.Visibility = _controller.QueuedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
         InfoBadgeDownloadsCompleted.Value = _controller.CompletedDownloadsCount;
         InfoBadgeDownloadsCompleted.Visibility = _controller.CompletedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
-
         if (selectedTag == "3" || selectedTag == "0")
         {
             var history = await _controller.GetHistoryAsync();
