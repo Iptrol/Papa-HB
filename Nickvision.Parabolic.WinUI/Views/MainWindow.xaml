@@ -210,14 +210,6 @@
                                         <InfoBadge x:Name="InfoBadgeDownloadsRunning" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
                                     </NavigationViewItem.InfoBadge>
                                 </NavigationViewItem>
-                                <NavigationViewItem x:Name="NavDownloadsQueued" Tag="2">
-                                    <NavigationViewItem.Icon>
-                                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE917;"/>
-                                    </NavigationViewItem.Icon>
-                                    <NavigationViewItem.InfoBadge>
-                                        <InfoBadge x:Name="InfoBadgeDownloadsQueued" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
-                                    </NavigationViewItem.InfoBadge>
-                                </NavigationViewItem>
                                 <NavigationViewItem x:Name="NavDownloadsCompleted" Tag="3">
                                     <NavigationViewItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE73E;"/>
