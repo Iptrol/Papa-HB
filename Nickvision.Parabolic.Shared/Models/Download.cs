@@ -17,11 +17,13 @@ namespace Nickvision.Parabolic.Shared.Models;
 public partial class Download : IDisposable
 {
     private static int _nextId;
+    private const int MaxLogLength = 100000;
 
     private readonly IConfigurationService _configurationService;
     private readonly ITranslationService _translationService;
     private readonly IYtdlpExecutableService _ytdlpExecutableService;
     private readonly StringBuilder _logBuilder;
+    private string _lastFilePath;
     private bool _removeSourceData;
     private Process? _process;
     private int _progressSkipCounter;
@@ -46,6 +48,7 @@ public partial class Download : IDisposable
         _translationService = translationService;
         _ytdlpExecutableService = ytdlpExecutableService;
         _logBuilder = new StringBuilder();
+        _lastFilePath = string.Empty;
         _removeSourceData = false;
         _process = null;
         _progressSkipCounter = 0;
@@ -148,19 +151,24 @@ public partial class Download : IDisposable
         {
             try
             {
-                var finalPath = string.Empty;
-                var log = _logBuilder.ToString();
-                var endIndex = log.Length;
-                for (var i = 0; i < 2 && endIndex > 0; i++)
+                // Використовуємо _lastFilePath який оновлювався під час завантаження
+                var finalPath = _lastFilePath;
+                if (string.IsNullOrEmpty(finalPath) || !File.Exists(finalPath))
                 {
-                    var startIndex = log.LastIndexOf('\n', endIndex - 1);
-                    var line = (startIndex == -1 ? log[..endIndex] : log[(startIndex + 1)..endIndex]).Trim('\r');
-                    if (!string.IsNullOrWhiteSpace(line))
+                    // Fallback — шукаємо в логу
+                    var log = _logBuilder.ToString();
+                    var endIndex = log.Length;
+                    for (var i = 0; i < 5 && endIndex > 0; i++)
                     {
-                        finalPath = line;
-                        break;
+                        var startIndex = log.LastIndexOf('\n', endIndex - 1);
+                        var line = (startIndex == -1 ? log[..endIndex] : log[(startIndex + 1)..endIndex]).Trim('\r');
+                        if (!string.IsNullOrWhiteSpace(line) && File.Exists(line))
+                        {
+                            finalPath = line;
+                            break;
+                        }
+                        endIndex = startIndex == -1 ? 0 : startIndex;
                     }
-                    endIndex = startIndex == -1 ? 0 : startIndex;
                 }
                 if (!string.IsNullOrEmpty(finalPath) && File.Exists(finalPath))
                 {
@@ -199,46 +207,16 @@ public partial class Download : IDisposable
                         track.Description = string.Empty;
                         track.EncodedBy = string.Empty;
                         track.Encoder = string.Empty;
-                        if (track.AdditionalFields.ContainsKey("comment"))
-                        {
-                            track.AdditionalFields.Remove("comment");
-                        }
-                        if (track.AdditionalFields.ContainsKey("COMMENT"))
-                        {
-                            track.AdditionalFields.Remove("COMMENT");
-                        }
-                        if (track.AdditionalFields.ContainsKey("description"))
-                        {
-                            track.AdditionalFields.Remove("description");
-                        }
-                        if (track.AdditionalFields.ContainsKey("DESCRIPTION"))
-                        {
-                            track.AdditionalFields.Remove("DESCRIPTION");
-                        }
-                        if (track.AdditionalFields.ContainsKey("purl"))
-                        {
-                            track.AdditionalFields.Remove("purl");
-                        }
-                        if (track.AdditionalFields.ContainsKey("PURL"))
-                        {
-                            track.AdditionalFields.Remove("PURL");
-                        }
-                        if (track.AdditionalFields.ContainsKey("synopsis"))
-                        {
-                            track.AdditionalFields.Remove("synopsis");
-                        }
-                        if (track.AdditionalFields.ContainsKey("SYNOPSIS"))
-                        {
-                            track.AdditionalFields.Remove("SYNOPSIS");
-                        }
-                        if (track.AdditionalFields.ContainsKey("url"))
-                        {
-                            track.AdditionalFields.Remove("url");
-                        }
-                        if (track.AdditionalFields.ContainsKey("URL"))
-                        {
-                            track.AdditionalFields.Remove("URL");
-                        }
+                        if (track.AdditionalFields.ContainsKey("comment")) track.AdditionalFields.Remove("comment");
+                        if (track.AdditionalFields.ContainsKey("COMMENT")) track.AdditionalFields.Remove("COMMENT");
+                        if (track.AdditionalFields.ContainsKey("description")) track.AdditionalFields.Remove("description");
+                        if (track.AdditionalFields.ContainsKey("DESCRIPTION")) track.AdditionalFields.Remove("DESCRIPTION");
+                        if (track.AdditionalFields.ContainsKey("purl")) track.AdditionalFields.Remove("purl");
+                        if (track.AdditionalFields.ContainsKey("PURL")) track.AdditionalFields.Remove("PURL");
+                        if (track.AdditionalFields.ContainsKey("synopsis")) track.AdditionalFields.Remove("synopsis");
+                        if (track.AdditionalFields.ContainsKey("SYNOPSIS")) track.AdditionalFields.Remove("SYNOPSIS");
+                        if (track.AdditionalFields.ContainsKey("url")) track.AdditionalFields.Remove("url");
+                        if (track.AdditionalFields.ContainsKey("URL")) track.AdditionalFields.Remove("URL");
                         await track.SaveAsync();
                     }
                 }
@@ -271,7 +249,22 @@ public partial class Download : IDisposable
             }
             return;
         }
-        _logBuilder.AppendLine(e.Data);
+
+        // Зберігаємо шлях до файлу окремо щоб не втратити його при обрізці логу
+        if (e.Data.Length > 3 && e.Data[1] == ':' && (e.Data.EndsWith(".mp4") || e.Data.EndsWith(".mp3") || e.Data.EndsWith(".mkv") || e.Data.EndsWith(".webm") || e.Data.EndsWith(".m4a") || e.Data.EndsWith(".opus") || e.Data.EndsWith(".flac") || e.Data.EndsWith(".wav") || e.Data.EndsWith(".ogg") || e.Data.EndsWith(".mov") || e.Data.EndsWith(".avi")))
+        {
+            if (File.Exists(e.Data.Trim()))
+            {
+                _lastFilePath = e.Data.Trim();
+            }
+        }
+
+        // Обмежуємо розмір логу
+        if (_logBuilder.Length < MaxLogLength)
+        {
+            _logBuilder.AppendLine(e.Data);
+        }
+
         try
         {
             if (e.Data.StartsWith("[Parabolic] Progress", StringComparison.Ordinal))
