@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Nickvision.Desktop.Application;
 using Nickvision.Desktop.Filesystem;
 using Nickvision.Desktop.Globalization;
@@ -25,6 +25,7 @@ public class MainWindowController
     private readonly IDatabaseService _databaseService;
     private readonly IDenoExecutableService _denoExecutableService;
     private readonly IDownloadService _downloadService;
+    private readonly IHistoryService _historyService;
     private readonly INotificationService _notificationService;
     private readonly IPowerService _powerService;
     private readonly IRecoveryService _recoveryService;
@@ -35,7 +36,7 @@ public class MainWindowController
     private AppVersion _latestYtdlpVersion;
     private AppVersion _latestDenoVersion;
 
-    public MainWindowController(ILogger<MainWindowController> logger, AppInfo appInfo, IArgumentsService argumentsService, IConfigurationService configurationService, IDatabaseService databaseService, IDenoExecutableService denoExecutableService, IDownloadService downloadService, INotificationService notificationService, IPowerService powerService, IRecoveryService recoveryService, ITranslationService translationService, IUpdaterService updaterService, IYtdlpExecutableService ytdlpExecutableService)
+    public MainWindowController(ILogger<MainWindowController> logger, AppInfo appInfo, IArgumentsService argumentsService, IConfigurationService configurationService, IDatabaseService databaseService, IDenoExecutableService denoExecutableService, IDownloadService downloadService, IHistoryService historyService, INotificationService notificationService, IPowerService powerService, IRecoveryService recoveryService, ITranslationService translationService, IUpdaterService updaterService, IYtdlpExecutableService ytdlpExecutableService)
     {
         _logger = logger;
         _appInfo = appInfo;
@@ -44,6 +45,7 @@ public class MainWindowController
         _databaseService = databaseService;
         _denoExecutableService = denoExecutableService;
         _downloadService = downloadService;
+        _historyService = historyService;
         _notificationService = notificationService;
         _powerService = powerService;
         _recoveryService = recoveryService;
@@ -55,9 +57,7 @@ public class MainWindowController
         _latestDenoVersion = _denoExecutableService.BundledVersion;
         _translationService.Language = _configurationService.TranslationLanguage;
         _logger.LogInformation($"Received command-line arguments: [{string.Join(", ", argumentsService.Data)}]");
-        // Events
         _configurationService.Saved += ConfigurationService_Saved;
-        // Translate strings
         _appInfo.ShortName = translationService._("Parabolic");
         _appInfo.Description = translationService._("Download web video and audio.");
         _appInfo.ExtraLinks.Add(translationService._("Matrix Chat"), new Uri("https://matrix.to/#/#nickvision:matrix.org"));
@@ -71,23 +71,18 @@ public class MainWindowController
     }
 
     public bool CanShutdown => _downloadService.RemainingCount == 0;
-
     public int CompletedDownloadsCount => _downloadService.CompletedCount;
-
     public int FailedDownloadsCount => _downloadService.FailedCount;
-
     public int QueuedDownloadsCount => _downloadService.QueuedCount;
-
     public int RecoverableDownloadsCount => _recoveryService.Count;
-
     public int RemainingDownloadsCount => _downloadService.RemainingCount;
-
     public int RunningDownloadsCount => _downloadService.DownloadingCount;
+
+    public Task<IReadOnlyList<HistoricDownload>> GetHistoryAsync() => _historyService.GetAllAsync();
 
     public bool ShowDisclaimerOnStartup
     {
         get => _configurationService.ShowDisclaimerOnStartup;
-
         set => _configurationService.ShowDisclaimerOnStartup = value;
     }
 
@@ -96,7 +91,6 @@ public class MainWindowController
     public WindowGeometry WindowGeometry
     {
         get => _configurationService.WindowGeometry;
-
         set => _configurationService.WindowGeometry = value;
     }
 
