@@ -108,6 +108,7 @@ public partial class Download : IDisposable
         _removeSourceData = _configurationService.RemoveSourceData;
         _process = _ytdlpExecutableService.GetDownloadProcess(Options);
         _process.EnableRaisingEvents = true; // required for Exited event
+        
         Status = DownloadStatus.Running;
         _process.Exited += Process_Exited;
         _process.OutputDataReceived += Process_OutputDataReceived;
