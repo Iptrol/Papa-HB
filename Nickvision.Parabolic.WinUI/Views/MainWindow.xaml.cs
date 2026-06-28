@@ -151,6 +151,7 @@ public sealed partial class MainWindow : Window
         {
             await AddDownloadAsync(_controller.UrlFromArgs);
         }
+        _ = UpdateHistoryAsync();
     }
 
     private async void Window_Closing(AppWindow sender, AppWindowClosingEventArgs e)
@@ -279,6 +280,7 @@ public sealed partial class MainWindow : Window
         {
             row.TriggerCompletedState(e);
             UpdateDownloadsList();
+            _ = UpdateHistoryAsync();
         }
     }
 
