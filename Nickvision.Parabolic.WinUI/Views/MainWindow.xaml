@@ -26,64 +26,9 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-
                     <ImageIcon Grid.Column="0" VerticalAlignment="Center" Height="18" Source="/Assets/papa_cat.ico"/>
                     <TextBlock x:Name="LblTitle" Grid.Column="1" Margin="12,0,6,0" VerticalAlignment="Center" Style="{ThemeResource CaptionTextBlockStyle}"/>
-
-                    <MenuBar Grid.Column="2">
-                        <MenuBarItem x:Name="MenuFile">
-                            <MenuFlyoutItem x:Name="MenuAddDownload" Click="AddDownload">
-                                <MenuFlyoutItem.KeyboardAccelerators>
-                                    <KeyboardAccelerator Key="N" Modifiers="Control"/>
-                                </MenuFlyoutItem.KeyboardAccelerators>
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                            <MenuFlyoutSeparator/>
-                            <MenuFlyoutItem x:Name="MenuExit" Click="Exit">
-                                <MenuFlyoutItem.KeyboardAccelerators>
-                                    <KeyboardAccelerator Key="F4" Modifiers="Menu"/>
-                                    <KeyboardAccelerator Key="Q" Modifiers="Control"/>
-                                </MenuFlyoutItem.KeyboardAccelerators>
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                        </MenuBarItem>
-
-                        <MenuBarItem x:Name="MenuDownloads">
-                            <MenuFlyoutItem x:Name="MenuStopAllRemaining" Click="StopAllRemaining">
-                                <MenuFlyoutItem.KeyboardAccelerators>
-                                    <KeyboardAccelerator Key="S" Modifiers="Control,Shift"/>
-                                </MenuFlyoutItem.KeyboardAccelerators>
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE71A;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                            <MenuFlyoutItem x:Name="MenuRetryAllFailed" Click="RetryAllFailed">
-                                <MenuFlyoutItem.KeyboardAccelerators>
-                                    <KeyboardAccelerator Key="R" Modifiers="Control,Shift"/>
-                                </MenuFlyoutItem.KeyboardAccelerators>
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE72C;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                            <MenuFlyoutSeparator/>
-                            <MenuFlyoutItem x:Name="MenuClearAllQueued" Click="ClearAllQueued">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                            <MenuFlyoutItem x:Name="MenuClearAllCompleted" Click="ClearAllCompleted">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                        </MenuBarItem>
-                    </MenuBar>
                 </Grid>
             </TitleBar.LeftHeader>
 
@@ -116,157 +61,134 @@
         <MenuFlyoutSeparator Grid.Row="1"/>
 
         <Grid Grid.Row="2">
-            <nickvision:ViewStack x:Name="ViewStack" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <nickvision:ViewStack.Pages>
-                    <StackPanel Margin="48,48,48,48" HorizontalAlignment="Stretch" Orientation="Vertical" Spacing="12">
-                        <TextBlock x:Name="LblHomeTitle" HorizontalAlignment="Left" Style="{ThemeResource TitleTextBlockStyle}" TextWrapping="Wrap"/>
-                        <TextBlock x:Name="LblHomeDescription" HorizontalAlignment="Left" Foreground="Gray"/>
-                        <HyperlinkButton Margin="0,24,0,0" Click="AddDownload">
-                            <HyperlinkButton.Content>
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
-                                    <TextBlock x:Name="LblAddDownload"/>
-                                </StackPanel>
-                            </HyperlinkButton.Content>
-                        </HyperlinkButton>
-                    </StackPanel>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+            <!-- Шапка з привітанням — завжди видима -->
+            <StackPanel Grid.Row="0" Margin="24,12,24,12" Orientation="Vertical" Spacing="4">
+                <TextBlock x:Name="LblHomeTitle" HorizontalAlignment="Left" Style="{ThemeResource TitleTextBlockStyle}" TextWrapping="Wrap"/>
+                <TextBlock x:Name="LblHomeDescription" HorizontalAlignment="Left" Foreground="Gray"/>
+            </StackPanel>
 
-                        <Grid Grid.Row="0" Margin="12,0,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+            <!-- Панель кнопок -->
+            <Grid Grid.Row="1" Margin="12,0,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                            <Button Grid.Column="1" Style="{ThemeResource AccentButtonStyle}" Click="AddDownload">
-                                <Button.Content>
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
-                                        <TextBlock x:Name="LblDownloadsAddDownload"/>
-                                    </StackPanel>
-                                </Button.Content>
-                            </Button>
+                <Button Grid.Column="0" Style="{ThemeResource AccentButtonStyle}" Click="AddDownload">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
+                            <TextBlock x:Name="LblDownloadsAddDownload"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
 
-                            <CommandBar Grid.Column="2" DefaultLabelPosition="Right">
-                                <CommandBar.PrimaryCommands>
-                                    <AppBarButton x:Name="BtnStopAllRemaining" Click="StopAllRemaining">
-                                        <AppBarButton.Icon>
-                                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE71A;"/>
-                                        </AppBarButton.Icon>
-                                    </AppBarButton>
-                                    <AppBarButton x:Name="BtnRetryAllFailed" Click="RetryAllFailed">
-                                        <AppBarButton.Icon>
-                                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE72C;"/>
-                                        </AppBarButton.Icon>
-                                    </AppBarButton>
-                                    <AppBarSeparator/>
-                                </CommandBar.PrimaryCommands>
-                                <CommandBar.SecondaryCommands>
-                                    <AppBarButton x:Name="BtnClearAllQueued" Click="ClearAllQueued">
-                                        <AppBarButton.Icon>
-                                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
-                                        </AppBarButton.Icon>
-                                    </AppBarButton>
-                                    <AppBarButton x:Name="BtnClearAllCompleted" Click="ClearAllCompleted">
-                                        <AppBarButton.Icon>
-                                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
-                                        </AppBarButton.Icon>
-                                    </AppBarButton>
-                                </CommandBar.SecondaryCommands>
-                            </CommandBar>
-                        </Grid>
+                <CommandBar Grid.Column="2" DefaultLabelPosition="Right">
+                    <CommandBar.PrimaryCommands>
+                        <AppBarButton x:Name="BtnStopAllRemaining" Click="StopAllRemaining">
+                            <AppBarButton.Icon>
+                                <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE71A;"/>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                        <AppBarButton x:Name="BtnRetryAllFailed" Click="RetryAllFailed">
+                            <AppBarButton.Icon>
+                                <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE72C;"/>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                        <AppBarSeparator/>
+                    </CommandBar.PrimaryCommands>
+                    <CommandBar.SecondaryCommands>
+                        <AppBarButton x:Name="BtnClearAllQueued" Click="ClearAllQueued">
+                            <AppBarButton.Icon>
+                                <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                        <AppBarButton x:Name="BtnClearAllCompleted" Click="ClearAllCompleted">
+                            <AppBarButton.Icon>
+                                <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE894;"/>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                    </CommandBar.SecondaryCommands>
+                </CommandBar>
+            </Grid>
 
-                        <MenuFlyoutSeparator Grid.Row="1" HorizontalAlignment="Stretch"/>
+            <!-- Список завантажень -->
+            <NavigationView x:Name="NavViewDownloads" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            IsPaneToggleButtonVisible="False" IsBackButtonVisible="Collapsed" IsSettingsVisible="False"
+                            PaneDisplayMode="Left" OpenPaneLength="240" SelectionChanged="NavViewDownloads_SelectionChanged">
+                <NavigationView.Resources>
+                    <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent"/>
+                    <SolidColorBrush x:Key="NavigationViewContentGridBorderBrush" Color="Transparent"/>
+                </NavigationView.Resources>
 
-                        <NavigationView x:Name="NavViewDownloads" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                        IsPaneToggleButtonVisible="False" IsBackButtonVisible="Collapsed" IsSettingsVisible="False"
-                                        PaneDisplayMode="Left" OpenPaneLength="240" SelectionChanged="NavViewDownloads_SelectionChanged">
-                            <NavigationView.Resources>
-                                <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent"/>
-                                <SolidColorBrush x:Key="NavigationViewContentGridBorderBrush" Color="Transparent"/>
-                            </NavigationView.Resources>
+                <NavigationView.MenuItems>
+                    <NavigationViewItem x:Name="NavDownloadsAll" Tag="0" IsSelected="True">
+                        <NavigationViewItem.Icon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE71D;"/>
+                        </NavigationViewItem.Icon>
+                        <NavigationViewItem.InfoBadge>
+                            <InfoBadge x:Name="InfoBadgeDownloadsAll" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
+                        </NavigationViewItem.InfoBadge>
+                    </NavigationViewItem>
+                    <NavigationViewItem x:Name="NavDownloadsRunning" Tag="1">
+                        <NavigationViewItem.Icon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE768;"/>
+                        </NavigationViewItem.Icon>
+                        <NavigationViewItem.InfoBadge>
+                            <InfoBadge x:Name="InfoBadgeDownloadsRunning" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
+                        </NavigationViewItem.InfoBadge>
+                    </NavigationViewItem>
+                    <NavigationViewItem x:Name="NavDownloadsQueued" Tag="2">
+                        <NavigationViewItem.Icon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE917;"/>
+                        </NavigationViewItem.Icon>
+                        <NavigationViewItem.InfoBadge>
+                            <InfoBadge x:Name="InfoBadgeDownloadsQueued" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
+                        </NavigationViewItem.InfoBadge>
+                    </NavigationViewItem>
+                    <NavigationViewItem x:Name="NavDownloadsCompleted" Tag="3">
+                        <NavigationViewItem.Icon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE73E;"/>
+                        </NavigationViewItem.Icon>
+                        <NavigationViewItem.InfoBadge>
+                            <InfoBadge x:Name="InfoBadgeDownloadsCompleted" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
+                        </NavigationViewItem.InfoBadge>
+                    </NavigationViewItem>
+                </NavigationView.MenuItems>
 
-                            <NavigationView.MenuItems>
-                                <NavigationViewItem x:Name="NavDownloadsAll" Tag="0" IsSelected="True">
-                                    <NavigationViewItem.Icon>
-                                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE71D;"/>
-                                    </NavigationViewItem.Icon>
-                                    <NavigationViewItem.InfoBadge>
-                                        <InfoBadge x:Name="InfoBadgeDownloadsAll" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
-                                    </NavigationViewItem.InfoBadge>
-                                </NavigationViewItem>
-                                <NavigationViewItem x:Name="NavDownloadsRunning" Tag="1">
-                                    <NavigationViewItem.Icon>
-                                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE768;"/>
-                                    </NavigationViewItem.Icon>
-                                    <NavigationViewItem.InfoBadge>
-                                        <InfoBadge x:Name="InfoBadgeDownloadsRunning" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
-                                    </NavigationViewItem.InfoBadge>
-                                </NavigationViewItem>
-                                <NavigationViewItem x:Name="NavDownloadsCompleted" Tag="3">
-                                    <NavigationViewItem.Icon>
-                                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE73E;"/>
-                                    </NavigationViewItem.Icon>
-                                    <NavigationViewItem.InfoBadge>
-                                        <InfoBadge x:Name="InfoBadgeDownloadsCompleted" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
-                                    </NavigationViewItem.InfoBadge>
-                                </NavigationViewItem>
-                                <NavigationViewItem x:Name="NavDownloadsFailed" Tag="4">
-                                    <NavigationViewItem.Icon>
-                                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE783;"/>
-                                    </NavigationViewItem.Icon>
-                                    <NavigationViewItem.InfoBadge>
-                                        <InfoBadge x:Name="InfoBadgeDownloadsFailed" Style="{StaticResource AttentionValueInfoBadgeStyle}" Visibility="Collapsed"/>
-                                    </NavigationViewItem.InfoBadge>
-                                </NavigationViewItem>
-                            </NavigationView.MenuItems>
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <nickvision:ViewStack x:Name="ViewStackDownloads">
+                        <nickvision:ViewStack.Pages>
+                            <nickvision:StatusPage x:Name="StatusNoneDownloads" Glyph="&#xE896;">
+                                <nickvision:StatusPage.Child>
+                                    <Button Click="AddDownload">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
+                                                <TextBlock x:Name="LblNoneAddDownload"/>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                </nickvision:StatusPage.Child>
+                            </nickvision:StatusPage>
+                            <ItemsRepeater x:Name="ListDownloads" Margin="12,6,12,0">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Spacing="6"/>
+                                </ItemsRepeater.Layout>
+                            </ItemsRepeater>
+                        </nickvision:ViewStack.Pages>
+                    </nickvision:ViewStack>
+                </ScrollViewer>
+            </NavigationView>
 
-                            <NavigationView.FooterMenuItems>
-                                <NavigationViewItem x:Name="NavHistory" Tag="history" Tapped="NavHistory_Tapped">
-                                    <NavigationViewItem.Icon>
-                                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE81C;"/>
-                                    </NavigationViewItem.Icon>
-                                </NavigationViewItem>
-                            </NavigationView.FooterMenuItems>
-
-                            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                                <nickvision:ViewStack x:Name="ViewStackDownloads">
-                                    <nickvision:ViewStack.Pages>
-                                        <nickvision:StatusPage x:Name="StatusNoneDownloads" Glyph="&#xE896;">
-                                            <nickvision:StatusPage.Child>
-                                                <Button Click="AddDownload">
-                                                    <Button.Content>
-                                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE710;"/>
-                                                            <TextBlock x:Name="LblNoneAddDownload"/>
-                                                        </StackPanel>
-                                                    </Button.Content>
-                                                </Button>
-                                            </nickvision:StatusPage.Child>
-                                        </nickvision:StatusPage>
-                                        <ItemsRepeater x:Name="ListDownloads" Margin="12,6,12,0">
-                                            <ItemsRepeater.Layout>
-                                                <StackLayout Spacing="6"/>
-                                            </ItemsRepeater.Layout>
-                                        </ItemsRepeater>
-                                    </nickvision:ViewStack.Pages>
-                                </nickvision:ViewStack>
-                            </ScrollViewer>
-                        </NavigationView>
-                    </Grid>
-
-                    <Frame x:Name="FrameCustom"/>
-                </nickvision:ViewStack.Pages>
-            </nickvision:ViewStack>
-
-            <InfoBar x:Name="InfoBar" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,12" IsOpen="False">
+            <InfoBar x:Name="InfoBar" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,12" IsOpen="False">
                 <InfoBar.ActionButton>
                     <Button x:Name="BtnInfoBar" HorizontalAlignment="Right" Visibility="Collapsed"/>
                 </InfoBar.ActionButton>
