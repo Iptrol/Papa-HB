@@ -22,13 +22,6 @@ namespace Nickvision.Parabolic.WinUI.Views;
 
 public sealed partial class MainWindow : Window
 {
-    private enum Pages
-    {
-        Home = 0,
-        Downloads,
-        Custom
-    }
-
     private readonly IServiceProvider _serviceProvider;
     private readonly MainWindowController _controller;
     private readonly AppInfo _appInfo;
@@ -75,17 +68,8 @@ public sealed partial class MainWindow : Window
         eventsService.DownloadRequested += async (s, args) => await AddDownloadAsync(args.Url);
         AppWindow.Title = "Папа Качай ❤️";
         LblTitle.Text = "Папа Качай ❤️";
-        MenuFile.Title = "Файл";
-        MenuAddDownload.Text = "Добавить загрузку";
-        MenuExit.Text = "Выход";
-        MenuDownloads.Title = "Загрузки";
-        MenuStopAllRemaining.Text = "Остановить все";
-        MenuRetryAllFailed.Text = "Повторить неудачные";
-        MenuClearAllQueued.Text = "Очистить очередь";
-        MenuClearAllCompleted.Text = "Очистить завершённые";
         LblHomeTitle.Text = "Привет, папа! 👋 Ну что, давай качать интересные видосы? 🎬\n\nТвои Лена, Саша и Фреди";
         LblHomeDescription.Text = "Вставь ссылку на видео или музыку с YouTube — и скачивай!";
-        LblAddDownload.Text = "Добавить ссылку";
         BtnStopAllRemaining.Label = "Остановить все";
         BtnRetryAllFailed.Label = "Повторить неудачные";
         BtnClearAllQueued.Label = "Очистить очередь";
@@ -93,9 +77,8 @@ public sealed partial class MainWindow : Window
         LblDownloadsAddDownload.Text = "Добавить";
         NavDownloadsAll.Content = "Все";
         NavDownloadsRunning.Content = "Идут";
+        NavDownloadsQueued.Content = "В очереди";
         NavDownloadsCompleted.Content = "Завершённые";
-        NavDownloadsFailed.Content = "Ошибки";
-        NavHistory.Content = "История";
         StatusNoneDownloads.Title = "Нет загрузок";
         StatusNoneDownloads.Description = "Загрузок этого типа пока нет";
         LblNoneAddDownload.Text = "Добавить ссылку";
@@ -108,7 +91,6 @@ public sealed partial class MainWindow : Window
 
     private async void Window_Loaded(object? sender, RoutedEventArgs e)
     {
-        ViewStack.SelectedIndex = (int)Pages.Home;
         ViewStackDownloads.SelectedIndex = 0;
         if (_controller.ShowDisclaimerOnStartup)
         {
@@ -274,11 +256,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void TitleBar_BackRequested(TitleBar sender, object args)
-    {
-        TitleBar.IsBackButtonVisible = false;
-        ViewStack.SelectedIndex = ViewStack.PreviousSelectedIndex;
-    }
+    private void TitleBar_BackRequested(TitleBar sender, object args) { }
 
     private async void Controller_DownloadAdded(object? sender, DownloadAddedEventArgs e)
     {
@@ -290,8 +268,6 @@ public sealed partial class MainWindow : Window
         await row.TriggerAddedStateAsync(e);
         _downloadRows[e.Id] = row;
         UpdateDownloadsList();
-        ViewStack.SelectedIndex = (int)Pages.Downloads;
-        TitleBar.IsBackButtonVisible = false;
     }
 
     private void Controller_DownloadCompleted(object? sender, DownloadCompletedEventArgs e)
@@ -381,28 +357,8 @@ public sealed partial class MainWindow : Window
 
     private void Settings(object sender, RoutedEventArgs args)
     {
-        TitleBar.IsBackButtonVisible = true;
-        ViewStack.SelectedIndex = (int)Pages.Custom;
         var settings = _serviceProvider.GetRequiredService<SettingsPage>();
         settings.WindowId = AppWindow.Id;
-        FrameCustom.Content = settings;
-    }
-
-    private async void History(object sender, RoutedEventArgs args)
-    {
-        var historyDialog = _serviceProvider.GetRequiredService<HistoryDialog>();
-        historyDialog.RequestedTheme = MainGrid.ActualTheme;
-        historyDialog.XamlRoot = MainGrid.XamlRoot;
-        await historyDialog.ShowAsync();
-    }
-
-    private async void NavHistory_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
-    {
-        NavViewDownloads.SelectedItem = null;
-        var historyDialog = _serviceProvider.GetRequiredService<HistoryDialog>();
-        historyDialog.RequestedTheme = MainGrid.ActualTheme;
-        historyDialog.XamlRoot = MainGrid.XamlRoot;
-        await historyDialog.ShowAsync();
     }
 
     private void ClearAllCompleted(object? sender, RoutedEventArgs e)
@@ -484,8 +440,8 @@ public sealed partial class MainWindow : Window
             if (selectedTag switch
             {
                 "1" => row.Status == DownloadStatus.Running || row.Status == DownloadStatus.Paused,
-                "3" => row.Status == DownloadStatus.Success || row.Status == DownloadStatus.Error || row.Status == DownloadStatus.Stopped,
-                "4" => row.Status == DownloadStatus.Error,
+                "2" => row.Status == DownloadStatus.Queued,
+                "3" => row.Status == DownloadStatus.Success || row.Status == DownloadStatus.Stopped,
                 _ => true
             })
             {
@@ -499,9 +455,9 @@ public sealed partial class MainWindow : Window
         InfoBadgeDownloadsAll.Visibility = _controller.RemainingDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
         InfoBadgeDownloadsRunning.Value = _controller.RunningDownloadsCount;
         InfoBadgeDownloadsRunning.Visibility = _controller.RunningDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
+        InfoBadgeDownloadsQueued.Value = _controller.QueuedDownloadsCount;
+        InfoBadgeDownloadsQueued.Visibility = _controller.QueuedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
         InfoBadgeDownloadsCompleted.Value = _controller.CompletedDownloadsCount;
         InfoBadgeDownloadsCompleted.Visibility = _controller.CompletedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
-        InfoBadgeDownloadsFailed.Value = _controller.FailedDownloadsCount;
-        InfoBadgeDownloadsFailed.Visibility = _controller.FailedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 }
