@@ -335,7 +335,11 @@ public sealed partial class MainWindow : Window
 
     private async void DownloadRow_RetryRequested(object? sender, int id) => await _controller.RetryDownloadAsync(id);
     private async void DownloadRow_StopRequested(object? sender, int id) => await _controller.StopDownloadAsync(id);
-    private void NavViewDownloads_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args) => UpdateDownloadsList();
+    private void NavViewDownloads_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    {
+        UpdateDownloadsList();
+        _ = UpdateHistoryAsync();
+    }
 
     private void UpdateProgress_Changed(object? sender, DownloadProgress e)
     {
@@ -458,7 +462,7 @@ public sealed partial class MainWindow : Window
         await AddDownloadAsync(url);
     }
 
-    private async void UpdateDownloadsList()
+    private void UpdateDownloadsList()
     {
         var selectedTag = ((NavViewDownloads.SelectedItem as NavigationViewItem)?.Tag as string) ?? string.Empty;
         var rows = new List<DownloadRow>(_downloadRows.Count);
@@ -486,6 +490,12 @@ public sealed partial class MainWindow : Window
         InfoBadgeDownloadsQueued.Visibility = _controller.QueuedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
         InfoBadgeDownloadsCompleted.Value = _controller.CompletedDownloadsCount;
         InfoBadgeDownloadsCompleted.Visibility = _controller.CompletedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
+        PanelHistory.Visibility = Visibility.Collapsed;
+    }
+
+    private async Task UpdateHistoryAsync()
+    {
+        var selectedTag = ((NavViewDownloads.SelectedItem as NavigationViewItem)?.Tag as string) ?? string.Empty;
         if (selectedTag == "3" || selectedTag == "0")
         {
             var history = await _controller.GetHistoryAsync();
@@ -498,10 +508,6 @@ public sealed partial class MainWindow : Window
             {
                 PanelHistory.Visibility = Visibility.Collapsed;
             }
-        }
-        else
-        {
-            PanelHistory.Visibility = Visibility.Collapsed;
         }
     }
 }
