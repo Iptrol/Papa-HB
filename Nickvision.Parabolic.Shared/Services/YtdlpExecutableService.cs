@@ -546,11 +546,16 @@ public class YtdlpExecutableService : DependencyExecutableService, IYtdlpExecuta
         {
             var startSec = (long)downloadOptions.TimeFrame.Start.TotalSeconds;
             var endSec = (long)downloadOptions.TimeFrame.End.TotalSeconds;
+            var durSec = (long)downloadOptions.TimeFrame.Duration.TotalSeconds;
             arguments.Add("--download-sections");
             arguments.Add($"*{startSec}-{endSec}");
             arguments.Add("--force-keyframes-at-cuts");
             arguments.Add("--postprocessor-args");
-            arguments.Add($"ExtractAudio+ffmpeg_i:-ss {startSec} -t {(long)downloadOptions.TimeFrame.Duration.TotalSeconds}");
+            arguments.Add($"Merger+ffmpeg_o:-t {durSec}");
+            arguments.Add("--postprocessor-args");
+            arguments.Add($"VideoRemuxer+ffmpeg_o:-t {durSec}");
+            arguments.Add("--postprocessor-args");
+            arguments.Add($"ExtractAudio+ffmpeg_i:-ss 0 -t {durSec}");
         }
         arguments.AddRange(_configurationService.YtdlpDownloadArgs.SplitCommandLine());
         return new Process()
