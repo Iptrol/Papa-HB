@@ -547,6 +547,7 @@ public class YtdlpExecutableService : DependencyExecutableService, IYtdlpExecuta
             var startSec = (long)downloadOptions.TimeFrame.Start.TotalSeconds;
             var endSec = (long)downloadOptions.TimeFrame.End.TotalSeconds;
             var durSec = (long)downloadOptions.TimeFrame.Duration.TotalSeconds;
+            var ffmpeg = Desktop.System.Environment.FindDependency("ffmpeg") ?? "ffmpeg";
             arguments.Add("--download-sections");
             arguments.Add($"*{startSec}-{endSec}");
             arguments.Add("--force-keyframes-at-cuts");
@@ -556,6 +557,16 @@ public class YtdlpExecutableService : DependencyExecutableService, IYtdlpExecuta
             arguments.Add($"VideoRemuxer+ffmpeg_o:-t {durSec}");
             arguments.Add("--postprocessor-args");
             arguments.Add($"ExtractAudio+ffmpeg_i:-ss 0 -t {durSec}");
+            if (OperatingSystem.IsWindows())
+            {
+                arguments.Add("--exec");
+                arguments.Add($"\"{ffmpeg}\" -i %(filepath)q -t {durSec} -c copy \"%(filepath)s.tmp%(ext)s\" && move /y \"%(filepath)s.tmp%(ext)s\" %(filepath)q");
+            }
+            else
+            {
+                arguments.Add("--exec");
+                arguments.Add($"\"{ffmpeg}\" -i %(filepath)q -t {durSec} -c copy \"%(filepath)s.tmp%(ext)s\" && mv \"%(filepath)s.tmp%(ext)s\" %(filepath)q");
+            }
         }
         arguments.AddRange(_configurationService.YtdlpDownloadArgs.SplitCommandLine());
         return new Process()
