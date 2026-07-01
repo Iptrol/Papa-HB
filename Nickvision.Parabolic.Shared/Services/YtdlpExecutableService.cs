@@ -304,7 +304,7 @@ public class YtdlpExecutableService : DependencyExecutableService, IYtdlpExecuta
                 arguments.Add($"Metadata+ffmpeg:-metadata track={downloadOptions.PlaylistPosition}");
             }
         }
-        if (_configurationService.EmbedThumbnails)
+        if (_configurationService.EmbedThumbnails && downloadOptions.TimeFrame is null)
         {
             if (downloadOptions.FileType.SupportsThumbnails)
             {
