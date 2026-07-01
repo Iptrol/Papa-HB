@@ -107,8 +107,7 @@ public partial class Download : IDisposable
         }
         _removeSourceData = _configurationService.RemoveSourceData;
         _process = _ytdlpExecutableService.GetDownloadProcess(Options);
-        _process.EnableRaisingEvents = true; // required for Exited event
-        
+        _process.EnableRaisingEvents = true;
         Status = DownloadStatus.Running;
         _process.Exited += Process_Exited;
         _process.OutputDataReceived += Process_OutputDataReceived;
@@ -173,33 +172,6 @@ public partial class Download : IDisposable
                 if (!string.IsNullOrEmpty(finalPath) && File.Exists(finalPath))
                 {
                     FilePath = finalPath;
-                    if (Options.TimeFrame is not null)
-                    {
-                        var durSec = (long)Options.TimeFrame.Duration.TotalSeconds;
-                        var ffmpeg = Desktop.System.Environment.FindDependency("ffmpeg") ?? "ffmpeg";
-                        var tmpPath = FilePath + ".tmp" + Path.GetExtension(FilePath);
-                        using var ffmpegProcess = new Process()
-                        {
-                            StartInfo = new ProcessStartInfo(ffmpeg, $"-y -i \"{FilePath}\" -t {durSec} -c copy \"{tmpPath}\"")
-                            {
-                                UseShellExecute = false,
-                                CreateNoWindow = true,
-                                RedirectStandardOutput = true,
-                                RedirectStandardError = true
-                            }
-                        };
-                        ffmpegProcess.Start();
-                        await ffmpegProcess.WaitForExitAsync();
-                        if (ffmpegProcess.ExitCode == 0 && File.Exists(tmpPath))
-                        {
-                            File.Delete(FilePath);
-                            File.Move(tmpPath, FilePath);
-                        }
-                        else if (File.Exists(tmpPath))
-                        {
-                            File.Delete(tmpPath);
-                        }
-                    }
                     if (_removeSourceData)
                     {
                         var track = new Track(FilePath);
