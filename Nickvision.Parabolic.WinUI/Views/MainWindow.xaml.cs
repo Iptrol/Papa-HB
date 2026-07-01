@@ -73,10 +73,6 @@ public sealed partial class MainWindow : Window
         LblTitle.Text = "Папа Качай ❤️";
         LblHomeTitle.Text = "Привет, папа! 👋 Ну что, давай качать интересные видосы? 🎬\n\nТвои Лена, Саша и Фреди";
         LblHomeDescription.Text = "Вставь ссылку на видео или музыку с YouTube — и скачивай!";
-        BtnStopAllRemaining.Label = "Остановить все";
-        BtnRetryAllFailed.Label = "Повторить неудачные";
-        BtnClearAllQueued.Label = "Очистить очередь";
-        BtnClearAllCompleted.Label = "Очистить завершённые";
         LblDownloadsAddDownload.Text = "Добавить";
         NavDownloadsAll.Content = "Все";
         NavDownloadsRunning.Content = "Идут";
@@ -328,24 +324,6 @@ public sealed partial class MainWindow : Window
         settings.WindowId = AppWindow.Id;
     }
 
-    private void ClearAllCompleted(object? sender, RoutedEventArgs e)
-    {
-        foreach (var id in _controller.ClearCompletedDownloads())
-        {
-            _downloadRows.Remove(id);
-        }
-        UpdateDownloadsList();
-    }
-
-    private void ClearAllQueued(object? sender, RoutedEventArgs e)
-    {
-        foreach (var id in _controller.ClearQueuedDownloads())
-        {
-            _downloadRows.Remove(id);
-        }
-        UpdateDownloadsList();
-    }
-
     private async void DenoUpdate(object? sender, RoutedEventArgs e)
     {
         var progress = new Progress<DownloadProgress>();
@@ -354,9 +332,6 @@ public sealed partial class MainWindow : Window
         await _controller.DenoUpdateAsync(progress);
         progress.ProgressChanged -= UpdateProgress_Changed;
     }
-
-    private async void RetryAllFailed(object? sender, RoutedEventArgs e) => await _controller.RetryFailedDownloadsAsync();
-    private async void StopAllRemaining(object? sender, RoutedEventArgs e) => await _controller.StopAllDownloadsAsync();
 
     private async void WindowsUpdate(object? sender, RoutedEventArgs e)
     {
