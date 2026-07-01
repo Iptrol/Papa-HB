@@ -29,11 +29,7 @@ public sealed partial class DownloadRow : UserControl
     private int _id;
     private string _path;
     private string _log;
-    private bool _isPaused;
 
-    public event EventHandler<int>? PauseRequested;
-    public event EventHandler<int>? ResumeRequested;
-    public event EventHandler<int>? StopRequested;
     public event EventHandler<int>? RetryRequested;
 
     public DownloadStatus Status { get; private set; }
@@ -46,10 +42,7 @@ public sealed partial class DownloadRow : UserControl
         _id = -1;
         _path = string.Empty;
         _log = string.Empty;
-        _isPaused = false;
         LblShowLog.Text = _translator._("Log");
-        LblPauseResume.Text = _translator._("Pause");
-        LblStop.Text = _translator._("Stop");
         LblPlay.Text = _translator._("Play");
         LblOpenFolder.Text = _translator._("Open");
         LblRetry.Text = _translator._("Retry");
@@ -118,17 +111,6 @@ public sealed partial class DownloadRow : UserControl
         }
     }
 
-    public void TriggerPausedState()
-    {
-        Status = DownloadStatus.Paused;
-        IcnStatus.Glyph = "\uE769";
-        LblStatus.Text = _translator._("Paused");
-        ProgBar.IsIndeterminate = false;
-        FntPauseResume.Glyph = "\uE768";
-        LblPauseResume.Text = _translator._("Resume");
-        _isPaused = true;
-    }
-
     public void TriggerProgressState(DownloadProgressChangedEventArgs args)
     {
         IcnStatus.Glyph = "\uE896";
@@ -159,14 +141,6 @@ public sealed partial class DownloadRow : UserControl
         }
         LblLog.Text = _log;
         ScrollLog.ChangeView(null, ScrollLog.ScrollableHeight, null);
-    }
-
-    public void TriggerResumedState()
-    {
-        Status = DownloadStatus.Running;
-        FntPauseResume.Glyph = "\uE769";
-        LblPauseResume.Text = _translator._("Pause");
-        _isPaused = false;
     }
 
     public void TriggerStartedFromQueueState()
@@ -203,18 +177,6 @@ public sealed partial class DownloadRow : UserControl
         }
     }
 
-    private void PauseResume(object sender, RoutedEventArgs e)
-    {
-        if (_isPaused)
-        {
-            ResumeRequested?.Invoke(this, _id);
-        }
-        else
-        {
-            PauseRequested?.Invoke(this, _id);
-        }
-    }
-
     private async void Play(object sender, RoutedEventArgs e)
     {
         try
@@ -234,6 +196,4 @@ public sealed partial class DownloadRow : UserControl
     private void Retry(object sender, RoutedEventArgs e) => RetryRequested?.Invoke(this, _id);
 
     private void ShowLog(object sender, RoutedEventArgs e) => GridLog.Visibility = BtnShowLog.IsChecked ?? false ? Visibility.Visible : Visibility.Collapsed;
-
-    private void Stop(object sender, RoutedEventArgs e) => StopRequested?.Invoke(this, _id);
 }
