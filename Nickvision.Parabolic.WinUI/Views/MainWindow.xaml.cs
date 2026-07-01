@@ -126,32 +126,11 @@ public sealed partial class MainWindow : Window
                 _controller.ShowDisclaimerOnStartup = false;
             }
         }
-        if (_controller.RecoverableDownloadsCount > 0)
-        {
-            var recoverDialog = new ContentDialog()
-            {
-                Title = "Восстановить загрузки?",
-                Content = "Есть незавершённые загрузки. Хочешь загрузить их снова?",
-                PrimaryButtonText = "Да",
-                CloseButtonText = "Нет",
-                DefaultButton = ContentDialogButton.Primary,
-                RequestedTheme = MainGrid.ActualTheme,
-                XamlRoot = MainGrid.XamlRoot
-            };
-            if ((await recoverDialog.ShowAsync()) == ContentDialogResult.Primary)
-            {
-                await _controller.RecoverAllDownloadsAsync();
-            }
-            else
-            {
-                await _controller.ClearRecoverableDownloadsAsync();
-            }
-        }
+        await _controller.ClearRecoverableDownloadsAsync();
         if (_controller.UrlFromArgs is not null)
         {
             await AddDownloadAsync(_controller.UrlFromArgs);
         }
-        _ = UpdateHistoryAsync();
     }
 
     private async void Window_Closing(AppWindow sender, AppWindowClosingEventArgs e)
@@ -265,9 +244,6 @@ public sealed partial class MainWindow : Window
     private async void Controller_DownloadAdded(object? sender, DownloadAddedEventArgs e)
     {
         var row = _serviceProvider.GetRequiredService<DownloadRow>();
-        row.PauseRequested += DownloadRow_PauseRequested;
-        row.ResumeRequested += DownloadRow_ResumeRequested;
-        row.StopRequested += DownloadRow_StopRequested;
         row.RetryRequested += DownloadRow_RetryRequested;
         await row.TriggerAddedStateAsync(e);
         _downloadRows[e.Id] = row;
@@ -280,7 +256,6 @@ public sealed partial class MainWindow : Window
         {
             row.TriggerCompletedState(e);
             UpdateDownloadsList();
-            _ = UpdateHistoryAsync();
         }
     }
 
@@ -319,29 +294,11 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void DownloadRow_PauseRequested(object? sender, int id)
-    {
-        if (_controller.PauseDownload(id) && _downloadRows.TryGetValue(id, out var row))
-        {
-            row.TriggerPausedState();
-        }
-    }
-
-    private void DownloadRow_ResumeRequested(object? sender, int id)
-    {
-        if (_controller.ResumeDownload(id) && _downloadRows.TryGetValue(id, out var row))
-        {
-            row.TriggerResumedState();
-        }
-    }
-
     private async void DownloadRow_RetryRequested(object? sender, int id) => await _controller.RetryDownloadAsync(id);
-    private async void DownloadRow_StopRequested(object? sender, int id) => await _controller.StopDownloadAsync(id);
 
     private void NavViewDownloads_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
         UpdateDownloadsList();
-        _ = UpdateHistoryAsync();
     }
 
     private void UpdateProgress_Changed(object? sender, DownloadProgress e)
@@ -441,33 +398,6 @@ public sealed partial class MainWindow : Window
         await Launcher.LaunchUriAsync(uri);
     }
 
-    private async void HistoryPlay_Click(object? sender, RoutedEventArgs e)
-    {
-        if (sender is not Button btn || btn.Tag is not string path || !File.Exists(path)) return;
-        try
-        {
-            using var _ = Process.Start(new ProcessStartInfo()
-            {
-                FileName = path,
-                UseShellExecute = true
-            });
-        }
-        catch
-        {
-            try
-            {
-                await Launcher.LaunchFileAsync(await StorageFile.GetFileFromPathAsync(path));
-            }
-            catch { }
-        }
-    }
-
-    private async void HistoryDownloadAgain_Click(object? sender, RoutedEventArgs e)
-    {
-        if (sender is not Button btn || btn.Tag is not Uri url) return;
-        await AddDownloadAsync(url);
-    }
-
     private void UpdateDownloadsList()
     {
         var selectedTag = ((NavViewDownloads.SelectedItem as NavigationViewItem)?.Tag as string) ?? string.Empty;
@@ -496,31 +426,5 @@ public sealed partial class MainWindow : Window
         InfoBadgeDownloadsQueued.Visibility = _controller.QueuedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
         InfoBadgeDownloadsCompleted.Value = _controller.CompletedDownloadsCount;
         InfoBadgeDownloadsCompleted.Visibility = _controller.CompletedDownloadsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
-        PanelHistory.Visibility = Visibility.Collapsed;
-    }
-
-    private async Task UpdateHistoryAsync()
-    {
-        var selectedTag = ((NavViewDownloads.SelectedItem as NavigationViewItem)?.Tag as string) ?? string.Empty;
-        if (selectedTag == "3" || selectedTag == "0")
-        {
-            try
-            {
-                var history = await _controller.GetHistoryAsync();
-                if (history.Count > 0)
-                {
-                    ListHistory.ItemsSource = history;
-                    PanelHistory.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    PanelHistory.Visibility = Visibility.Collapsed;
-                }
-            }
-            catch
-            {
-                PanelHistory.Visibility = Visibility.Collapsed;
-            }
-        }
     }
 }
