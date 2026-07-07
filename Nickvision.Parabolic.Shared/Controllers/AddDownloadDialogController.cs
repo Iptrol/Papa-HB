@@ -326,23 +326,16 @@ public class AddDownloadDialogController
                 }
             }
             var previousFileType = (!hasVideo || _configurationService.PreviousDownloadImmediatelyAsAudio) ? _configurationService.PreviousAudioOnlyFileType : (_configurationService.PreviousDownloadImmediatelyAsVideo ? _configurationService.PreviousVideoOnlyFileType : _configurationService.PreviousFullFileType);
-            context.FileTypes.EnsureCapacity(hasVideo ? 13 : 7);
+            context.FileTypes.EnsureCapacity(hasVideo ? 6 : 4);
             if (hasVideo)
             {
                 context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.Video, _translationService._("Video (Generic)"), previousFileType == MediaFileType.Video));
                 context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.MP4, _translationService._("MP4 (Video)"), previousFileType == MediaFileType.MP4));
-                context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.WEBM, _translationService._("WEBM (Video)"), previousFileType == MediaFileType.WEBM));
-                context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.MKV, _translationService._("MKV (Video)"), previousFileType == MediaFileType.MKV));
                 context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.MOV, _translationService._("MOV (Video)"), previousFileType == MediaFileType.MOV));
-                context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.AVI, _translationService._("AVI (Video)"), previousFileType == MediaFileType.AVI));
             }
-            context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.Audio, _translationService._("Audio (Generic)"), previousFileType == MediaFileType.Audio));
             context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.MP3, _translationService._("MP3 (Audio)"), previousFileType == MediaFileType.MP3));
             context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.M4A, _translationService._("M4A (Audio)"), previousFileType == MediaFileType.M4A));
-            context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.OPUS, _translationService._("OPUS (Audio)"), previousFileType == MediaFileType.OPUS));
             context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.FLAC, _translationService._("FLAC (Audio)"), previousFileType == MediaFileType.FLAC));
-            context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.WAV, _translationService._("WAV (Audio)"), previousFileType == MediaFileType.WAV));
-            context.FileTypes.Add(new SelectionItem<MediaFileType>(MediaFileType.OGG, _translationService._("OGG (Audio)"), previousFileType == MediaFileType.OGG));
             var subtitles = new HashSet<SubtitleLanguage>();
             foreach (var media in res.Media)
             {
